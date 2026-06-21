@@ -319,6 +319,26 @@ async function checkBehr() {
 
 // ── Event listeners ───────────────────────────────────────────────────────────
 
+// Pattern chips — tap to select, tap again to deselect
+document.querySelectorAll('.pattern-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const isSelected = chip.classList.contains('selected');
+    document.querySelectorAll('.pattern-chip').forEach(c => c.classList.remove('selected'));
+
+    if (isSelected) {
+      targetPat.value = '';
+    } else {
+      chip.classList.add('selected');
+      targetPat.value = chip.dataset.pattern;
+    }
+  });
+});
+
+// Typing in the free-text field deselects any active chip
+targetPat.addEventListener('input', () => {
+  document.querySelectorAll('.pattern-chip').forEach(c => c.classList.remove('selected'));
+});
+
 checkBtn.addEventListener('click', checkBehr);
 
 // Ctrl/Cmd + Enter to submit

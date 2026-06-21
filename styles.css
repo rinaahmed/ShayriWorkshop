@@ -131,6 +131,38 @@ main {
   letter-spacing: 0;
 }
 
+.pattern-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.pattern-chip {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.pattern-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.pattern-chip.selected {
+  border-color: var(--gold);
+  background: rgba(184, 134, 11, 0.1);
+  color: var(--gold);
+  font-weight: 600;
+}
+
 #target-pattern {
   width: 100%;
   padding: 0.5rem 0.75rem;
