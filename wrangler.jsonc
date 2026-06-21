@@ -2,6 +2,14 @@
   "name": "shayariworkshop",
   "compatibility_date": "2026-06-21",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "exclude": [
+      ".git/**",
+      ".wrangler/**",
+      "proxy/**",
+      "*.md",
+      "wrangler.jsonc",
+      ".nojekyll"
+    ]
   }
 }
