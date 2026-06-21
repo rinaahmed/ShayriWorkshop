@@ -1,4 +1,4 @@
-const CACHE = 'shayari-workshop-v3';
+const CACHE = 'shayari-workshop-v4';
 
 const SHELL = [
   './',
