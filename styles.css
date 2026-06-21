@@ -85,10 +85,10 @@ main {
 
 #urdu-input {
   width: 100%;
-  min-height: 110px;
+  min-height: 80px;
   font-family: var(--font-urdu);
-  font-size: 1.8rem;
-  line-height: 3;
+  font-size: 1.3rem;
+  line-height: 2.6;
   direction: rtl;
   text-align: right;
   color: var(--purple);
@@ -97,12 +97,14 @@ main {
   border-bottom: 1px solid var(--border);
   outline: none;
   resize: vertical;
-  padding-bottom: 0.5rem;
+  /* Right padding prevents Nastaliq glyphs from being clipped at the RTL start edge */
+  padding: 0.25rem 0.75rem 0.5rem 0;
+  overflow: visible;
 }
 
 #urdu-input::placeholder {
   color: var(--border);
-  font-size: 1.4rem;
+  font-size: 1.1rem;
 }
 
 #urdu-input:focus {
