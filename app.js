@@ -34,49 +34,27 @@ Return this exact JSON structure:
   "poeticNote": "How this word is used in Urdu shayari, ghazals, or nazms — special poetic connotations, common imagery, or notable usage by famous poets"
 }`;
 
-const SYSTEM_PROMPT = `You are an expert in Urdu aruz (classical meter). Analyze the given line of Urdu shayari strictly syllable by syllable.
+const SYSTEM_PROMPT = `You are an expert in Urdu aruz (classical meter). Your job is to analyze a line of Urdu shayari.
 
-━━ MATRA VALUES ━━
-S (Short) = 1 matra  — open syllable: ends in a short vowel (zabar/zer/pesh)
-L (Long)  = 2 matras — closed syllable: ends in a consonant, OR contains a long vowel (آ / او / ای)
+Rules you must follow:
+- Every syllable is either Short (S, 1 matra) or Long (L, 2 matras)
+- Golden Rule: any syllable ending in a consonant is Long (closed syllable)
+- Long vowels (آ، او، ای) always make a syllable Long
+- Choti ye (ے) at end of syllable = Short
+- Bari ye (ی) = Long
+- Noon ghunna (ں) at end = makes syllable Long
+- uthaana / uthaake / uthaaye = S-L-S always (standard for this user)
+- The radif (repeating refrain at end of ghazal lines) should be identified and excluded from meter analysis
+- Return ONLY valid JSON, no markdown, no explanation outside the JSON
 
-━━ CLASSIFICATION RULES (apply in order) ━━
-1. Syllable ending in a consonant → L (closed syllable rule, overrides all else)
-2. Long vowel آ، او، ای in the syllable → L
-3. Bari ye ی → L
-4. Noon ghunna ں at end → L
-5. Choti ye ے at end → S
-6. uthaana / uthaake / uthaaye → always S-L-S
-7. Remaining open syllables → S
-
-━━ SPLITTING ━━
-Split EVERY word into its individual syllables. Each syllable = one entry in the array.
-"دل" = 1 syllable (دل → L, closed).
-"محبت" = 3 syllables (م-حب-بت → S-L-L).
-"جدائی" = 3 syllables (جُ-دا-ئی → S-L-L).
-Never put a whole multi-syllable word as a single entry.
-
-━━ KNOWN BEHR PATTERNS ━━
-Hazaj Murabbe:     S-L-L-L  S-L-L-L              (14 matras)
-Hazaj Musaddas:    S-L-L-L  S-L-L-L  S-L-L-L     (21 matras)
-Ramal Murabbe:     L-S-L-L  L-S-L-L              (14 matras)
-Ramal Musaddas:    L-S-L-L  L-S-L-L  L-S-L-L     (21 matras)
-Mutaqarib Murabbe: S-L-L    S-L-L    S-L-L  S-L-L (20 matras)
-
-totalMatras = sum of every syllable's matras field (S→1, L→2). Verify your arithmetic.
-
-The radif (repeating refrain) should be included in the syllable breakdown but noted in behrDescription if present.
-
-Return ONLY valid JSON — no markdown, no text outside the JSON.
-
+Return this exact JSON structure:
 {
   "syllables": [
-    {"urdu": "دل", "roman": "dil", "type": "L", "matras": 2},
-    {"urdu": "کی", "roman": "ki", "type": "S", "matras": 1}
+    {"urdu": "syllable in Urdu script", "roman": "romanized", "type": "S or L", "matras": 1}
   ],
   "totalMatras": 14,
   "pattern": "S-L-L-L-S-L-L-L",
-  "closestBehr": "Hazaj Murabbe",
+  "closestBehr": "Hazaj Musaddas | Hazaj Murabbe | Ramal Murabbe | Ramal Musaddas | Mutaqarib Murabbe | unclear",
   "behrDescription": "one line description of the behr",
   "feetAnalysis": [
     {"foot": 1, "pattern": "S-L-L-L", "match": true}
@@ -209,7 +187,7 @@ async function callClaude(urduLine, targetBehr) {
     `Target behr pattern (leave blank for auto-detect): ${targetBehr || ''}`,
   ].join('\n');
 
-  return callAPI(SYSTEM_PROMPT, userContent, 2048);
+  return callAPI(SYSTEM_PROMPT, userContent, 1024);
 }
 
 // ── Response parsing ──────────────────────────────────────────────────────────
