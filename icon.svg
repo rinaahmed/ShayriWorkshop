@@ -1,19 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Background -->
-  <rect width="512" height="512" rx="110" fill="#4A1C0E"/>
-
-  <!-- Outer diamond -->
-  <path d="M256 72 L440 256 L256 440 L72 256 Z"
-        fill="none" stroke="#C4943A" stroke-width="16"/>
-
-  <!-- Inner diamond filled -->
-  <path d="M256 152 L360 256 L256 360 L152 256 Z"
-        fill="#C4943A" opacity="0.28"/>
-
-  <!-- Inner diamond outline -->
-  <path d="M256 152 L360 256 L256 360 L152 256 Z"
-        fill="none" stroke="#C4943A" stroke-width="10"/>
-
-  <!-- Centre dot -->
-  <circle cx="256" cy="256" r="20" fill="#C4943A"/>
+  <rect width="512" height="512" rx="110" fill="#4D1209"/>
+  <rect x="136" y="136" width="240" height="240" rx="12" stroke="#C8922A" stroke-width="22" fill="none" transform="rotate(45 256 256)"/>
 </svg>
