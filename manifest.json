@@ -1,0 +1,20 @@
+{
+  "name": "Shayari Workshop",
+  "short_name": "Shayari",
+  "description": "Urdu behr (meter) checker for shayari",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#4A235A",
+  "background_color": "#FDFAF0",
+  "lang": "ur",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
