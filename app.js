@@ -34,24 +34,33 @@ Return this exact JSON structure:
   "poeticNote": "How this word is used in Urdu shayari, ghazals, or nazms — special poetic connotations, common imagery, or notable usage by famous poets"
 }`;
 
-// Narrower prompt: engine already did syllabification. Claude only resolves
-// uncertain syllables and provides behr-level judgment.
-const BEHR_JUDGMENT_PROMPT = `You are an expert in Urdu aruz (classical meter).
+const SYSTEM_PROMPT = `You are an expert in Urdu aruz (classical meter). Your job is to analyze a line of Urdu shayari.
 
-The syllable breakdown below was produced by a deterministic engine. Syllables marked "uncertain":true need your judgment — resolve each to type "S" (1 matra) or "L" (2 matras) based on classical aruz rules and context. Do NOT recount or change certain syllables.
+Rules you must follow:
+- Every syllable is either Short (S, 1 matra) or Long (L, 2 matras)
+- Golden Rule: any syllable ending in a consonant is Long (closed syllable)
+- Long vowels (آ، او، ای) always make a syllable Long
+- Choti ye (ے) at end of syllable = Short
+- Bari ye (ی) = Long
+- Noon ghunna (ں) at end = makes syllable Long
+- uthaana / uthaake / uthaaye = S-L-S always (standard for this user)
+- The radif (repeating refrain at end of ghazal lines) should be identified and excluded from meter analysis
+- Return ONLY valid JSON, no markdown, no explanation outside the JSON
 
-Then provide: closestBehr, behrDescription (one line), feetAnalysis (based on the full pattern after your resolutions), problemSyllables (0-based indices of syllables that break meter), and suggestion (one plain-English fix).
-
-Return ONLY valid JSON, no markdown, no explanation outside the JSON:
+Return this exact JSON structure:
 {
-  "resolutions": [
-    {"index": 2, "type": "S", "matras": 1, "roman": "romanized form"}
+  "syllables": [
+    {"urdu": "syllable in Urdu script", "roman": "romanized", "type": "S or L", "matras": 1}
   ],
+  "totalMatras": 14,
+  "pattern": "S-L-L-L-S-L-L-L",
   "closestBehr": "Hazaj Musaddas | Hazaj Murabbe | Ramal Murabbe | Ramal Musaddas | Mutaqarib Murabbe | unclear",
-  "behrDescription": "one line description",
-  "feetAnalysis": [{"foot": 1, "pattern": "S-L-L-L", "match": true}],
+  "behrDescription": "one line description of the behr",
+  "feetAnalysis": [
+    {"foot": 1, "pattern": "S-L-L-L", "match": true}
+  ],
   "problemSyllables": [2, 5],
-  "suggestion": "plain English one-line suggestion"
+  "suggestion": "plain English one-line suggestion about what word to fix and why"
 }`;
 
 function escapeHtml(str) {
@@ -169,32 +178,16 @@ async function callAPI(systemPrompt, userContent, maxTokens = 1024) {
   return res.json();
 }
 
-async function callClaudeJudgment(urduLine, syllables, targetBehr) {
-  const uncertain = syllables
-    .map((s, i) => ({ ...s, index: i }))
-    .filter(s => s.uncertain);
-
+async function callClaude(urduLine, targetBehr) {
   const userContent = [
-    'Line of Urdu shayari:',
+    'Analyze this line of Urdu shayari:',
+    '',
     urduLine,
     '',
-    'Pre-computed syllables (do NOT change certain ones):',
-    JSON.stringify(syllables.map((s, i) => ({
-      index: i,
-      urdu: s.urdu,
-      type: s.type,
-      matras: s.matras,
-      uncertain: s.uncertain,
-    })), null, 2),
-    '',
-    uncertain.length
-      ? `Uncertain syllables needing your resolution (indices): ${uncertain.map(s => s.index).join(', ')}`
-      : 'No uncertain syllables — skip resolutions array (return []).',
-    '',
-    `Target behr pattern (blank = auto-detect): ${targetBehr || ''}`,
+    `Target behr pattern (leave blank for auto-detect): ${targetBehr || ''}`,
   ].join('\n');
 
-  return callAPI(BEHR_JUDGMENT_PROMPT, userContent, 800);
+  return callAPI(SYSTEM_PROMPT, userContent, 1024);
 }
 
 // ── Response parsing ──────────────────────────────────────────────────────────
@@ -331,26 +324,17 @@ async function checkBehr() {
   resultsEl.hidden     = true;
 
   try {
-    // Layer 1: deterministic syllabifier
-    const syllables = scanLine(line);
-
-    if (!syllables.length) {
-      showMsg('Could not find any Urdu syllables in the input');
-      return;
-    }
-
-    // Layer 2: Claude resolves uncertain syllables + provides behr judgment
-    const raw = await callClaudeJudgment(line, syllables, targetPat.value.trim());
+    const raw = await callClaude(line, targetPat.value.trim());
     if (!raw) return;
 
-    let judgment;
+    let result;
     try {
-      judgment = parseResult(raw);
+      result = parseResult(raw);
     } catch {
       showMsg('Retrying…', 'success');
-      const raw2 = await callClaudeJudgment(line, syllables, targetPat.value.trim());
+      const raw2 = await callClaude(line, targetPat.value.trim());
       try {
-        judgment = parseResult(raw2);
+        result = parseResult(raw2);
         hideMsg();
       } catch {
         showMsg('Could not parse the response — please try again');
@@ -358,31 +342,12 @@ async function checkBehr() {
       }
     }
 
-    // Merge Claude's resolutions into syllable array
-    const merged = syllables.map((s, i) => ({ ...s }));
-    (judgment.resolutions || []).forEach(r => {
-      const idx = r.index;
-      if (idx >= 0 && idx < merged.length) {
-        merged[idx].type   = r.type   || merged[idx].type;
-        merged[idx].matras = r.matras || merged[idx].matras;
-        if (r.roman) merged[idx].roman = r.roman;
-        merged[idx].uncertain = false;
-      }
-    });
-
-    // Recompute totals deterministically — never trust Claude's arithmetic
-    const { totalMatras, pattern } = computePattern(merged);
-
-    const result = {
-      syllables:       merged,
-      totalMatras,
-      pattern,
-      closestBehr:     judgment.closestBehr     || 'unclear',
-      behrDescription: judgment.behrDescription || '',
-      feetAnalysis:    judgment.feetAnalysis    || [],
-      problemSyllables: judgment.problemSyllables || [],
-      suggestion:      judgment.suggestion       || '',
-    };
+    // Recompute arithmetic deterministically from syllables — never trust Claude's count
+    if (result.syllables && result.syllables.length) {
+      const { totalMatras, pattern } = computePattern(result.syllables);
+      result.totalMatras = totalMatras;
+      result.pattern     = pattern;
+    }
 
     displayResults(result);
     saveHistory(line, result);
