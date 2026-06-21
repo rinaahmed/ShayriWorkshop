@@ -47,6 +47,10 @@ Rules you must follow:
 - The radif (repeating refrain at end of ghazal lines) should be identified and excluded from meter analysis
 - Return ONLY valid JSON, no markdown, no explanation outside the JSON
 
+CRITICAL: Every multi-syllable word MUST be split into individual syllables in the syllables array.
+Example: "محبت" (mohabbat) → three separate entries: {"urdu":"مو","roman":"mo","type":"S","matras":1}, {"urdu":"حب","roman":"hab","type":"L","matras":2}, {"urdu":"بت","roman":"bat","type":"L","matras":2}
+Never place a whole word as a single syllable entry if it has more than one syllable.
+
 Return this exact JSON structure:
 {
   "syllables": [
@@ -187,7 +191,7 @@ async function callClaude(urduLine, targetBehr) {
     `Target behr pattern (leave blank for auto-detect): ${targetBehr || ''}`,
   ].join('\n');
 
-  return callAPI(SYSTEM_PROMPT, userContent);
+  return callAPI(SYSTEM_PROMPT, userContent, 2048);
 }
 
 // ── Response parsing ──────────────────────────────────────────────────────────
