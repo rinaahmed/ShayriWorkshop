@@ -1,8 +1,9 @@
-const CACHE = 'shayari-workshop-v8';
+const CACHE = 'shayari-workshop-v9';
 
 const SHELL = [
   './',
   './index.html',
+  './behr-engine.js',
   './app.js',
   './styles.css',
   './manifest.json',
