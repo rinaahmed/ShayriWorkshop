@@ -8,6 +8,32 @@ const BEHR_PATTERNS = {
   'Mutaqarib Murabbe': 'S-L-L-S-L-L-S-L-L-S-L-L',
 };
 
+const LOOKUP_PROMPT = `You are an expert in Urdu language and classical shayari (poetry).
+
+When given a word or phrase, determine if it is Urdu (any script or Roman Urdu) or English, then provide comprehensive information.
+
+Rules:
+- If the input is English: find the primary Urdu equivalent and provide all information about that Urdu word
+- If the input is Urdu script or Roman Urdu: provide information about that word
+- All synonym and antonym words must be in Urdu script
+- Return ONLY valid JSON, no markdown, no explanation outside the JSON
+
+Return this exact JSON structure:
+{
+  "inputLanguage": "urdu or english",
+  "word": "word in Urdu script",
+  "transliteration": "Roman Urdu pronunciation",
+  "meaningEn": "meaning in English",
+  "meaningUr": "meaning in Urdu script",
+  "synonyms": [
+    {"word": "Urdu word in script", "transliteration": "roman", "meaning": "English meaning"}
+  ],
+  "antonyms": [
+    {"word": "Urdu word in script", "transliteration": "roman", "meaning": "English meaning"}
+  ],
+  "poeticNote": "How this word is used in Urdu shayari, ghazals, or nazms — special poetic connotations, common imagery, or notable usage by famous poets"
+}`;
+
 const SYSTEM_PROMPT = `You are an expert in Urdu aruz (classical meter). Your job is to analyze a line of Urdu shayari.
 
 Rules you must follow:
@@ -37,6 +63,12 @@ Return this exact JSON structure:
   "suggestion": "plain English one-line suggestion about what word to fix and why"
 }`;
 
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 // DOM references
 const $ = id => document.getElementById(id);
 
@@ -61,6 +93,9 @@ const clearHistBtn  = $('clear-history');
 const historyToggle = $('history-toggle');
 const historyList   = $('history-list');
 const errorMsgEl    = $('error-message');
+const wordInput     = $('word-input');
+const lookupBtn     = $('lookup-btn');
+const lookupResultsEl = $('lookup-results');
 
 // ── Storage ──────────────────────────────────────────────────────────────────
 
@@ -104,7 +139,7 @@ function saveSettings() {
 
 // ── API call ─────────────────────────────────────────────────────────────────
 
-async function callClaude(urduLine, targetBehr) {
+async function callAPI(systemPrompt, userContent, maxTokens = 1024) {
   const apiKey   = store.get('apiKey');
   const proxyUrl = store.get('proxyUrl');
 
@@ -120,14 +155,6 @@ async function callClaude(urduLine, targetBehr) {
     return null;
   }
 
-  const userContent = [
-    'Analyze this line of Urdu shayari:',
-    '',
-    urduLine,
-    '',
-    `Target behr pattern (leave blank for auto-detect): ${targetBehr || ''}`,
-  ].join('\n');
-
   const res = await fetch(proxyUrl, {
     method: 'POST',
     headers: {
@@ -137,8 +164,8 @@ async function callClaude(urduLine, targetBehr) {
     },
     body: JSON.stringify({
       model:      'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system:     SYSTEM_PROMPT,
+      max_tokens: maxTokens,
+      system:     systemPrompt,
       messages:   [{ role: 'user', content: userContent }],
     }),
   });
@@ -149,6 +176,18 @@ async function callClaude(urduLine, targetBehr) {
   }
 
   return res.json();
+}
+
+async function callClaude(urduLine, targetBehr) {
+  const userContent = [
+    'Analyze this line of Urdu shayari:',
+    '',
+    urduLine,
+    '',
+    `Target behr pattern (leave blank for auto-detect): ${targetBehr || ''}`,
+  ].join('\n');
+
+  return callAPI(SYSTEM_PROMPT, userContent);
 }
 
 // ── Response parsing ──────────────────────────────────────────────────────────
@@ -317,7 +356,118 @@ async function checkBehr() {
   }
 }
 
+// ── Word Lookup ───────────────────────────────────────────────────────────────
+
+function renderLookupResults(r) {
+  const badge = r.inputLanguage === 'english' ? 'English → Urdu' : 'Urdu';
+
+  const wordList = (items) => (items || []).map(s => `
+    <div class="lookup-word-item">
+      <span class="lookup-item-urdu" dir="rtl" lang="ur">${escapeHtml(s.word)}</span>
+      <span class="lookup-item-roman">${escapeHtml(s.transliteration)}</span>
+      <span class="lookup-item-meaning">${escapeHtml(s.meaning)}</span>
+    </div>`).join('');
+
+  const synonymsHtml = r.synonyms && r.synonyms.length ? `
+    <div class="lookup-group">
+      <h3 class="lookup-group-title">Synonyms · مترادفات</h3>
+      <div class="lookup-word-list">${wordList(r.synonyms)}</div>
+    </div>` : '';
+
+  const antonymsHtml = r.antonyms && r.antonyms.length ? `
+    <div class="lookup-group">
+      <h3 class="lookup-group-title">Antonyms · متضادات</h3>
+      <div class="lookup-word-list">${wordList(r.antonyms)}</div>
+    </div>` : '';
+
+  const poeticHtml = r.poeticNote ? `
+    <div class="lookup-poetic-note">
+      <h3 class="lookup-group-title">Poetic Use · شعری استعمال</h3>
+      <p>${escapeHtml(r.poeticNote)}</p>
+    </div>` : '';
+
+  lookupResultsEl.innerHTML = `
+    <div class="lookup-word-header">
+      <span class="lookup-word-urdu" dir="rtl" lang="ur">${escapeHtml(r.word)}</span>
+      <span class="lookup-word-roman">${escapeHtml(r.transliteration)}</span>
+      <span class="lookup-badge">${escapeHtml(badge)}</span>
+    </div>
+    <div class="lookup-meanings">
+      <div class="lookup-meaning-en">${escapeHtml(r.meaningEn)}</div>
+      <div class="lookup-meaning-ur" dir="rtl" lang="ur">${escapeHtml(r.meaningUr)}</div>
+    </div>
+    ${synonymsHtml}
+    ${antonymsHtml}
+    ${poeticHtml}
+  `;
+
+  lookupResultsEl.hidden = false;
+  lookupResultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function lookupWord() {
+  const word = wordInput.value.trim();
+  if (!word) { showMsg('Please enter a word to look up'); return; }
+
+  hideMsg();
+  lookupBtn.disabled    = true;
+  lookupBtn.textContent = 'Looking up…';
+  lookupResultsEl.hidden = true;
+
+  try {
+    const raw = await callAPI(LOOKUP_PROMPT, word, 1024);
+    if (!raw) return;
+
+    let result;
+    try {
+      result = parseResult(raw);
+    } catch {
+      showMsg('Could not parse the response — please try again');
+      return;
+    }
+
+    renderLookupResults(result);
+  } catch (err) {
+    showMsg('Look up failed — check your API key or proxy URL and try again');
+    console.error('[Shayari Workshop]', err);
+  } finally {
+    lookupBtn.disabled    = false;
+    lookupBtn.textContent = 'Look Up';
+  }
+}
+
 // ── Event listeners ───────────────────────────────────────────────────────────
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => { p.hidden = true; });
+
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    $(tab.dataset.panel).hidden = false;
+
+    hideMsg();
+  });
+});
+
+// Auto-detect Urdu input and switch direction/font
+wordInput.addEventListener('input', () => {
+  const hasUrdu = /[؀-ۿ]/.test(wordInput.value);
+  wordInput.dir = hasUrdu ? 'rtl' : 'ltr';
+  wordInput.lang = hasUrdu ? 'ur' : 'en';
+  wordInput.classList.toggle('urdu-mode', hasUrdu);
+});
+
+lookupBtn.addEventListener('click', lookupWord);
+
+wordInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookupWord();
+});
 
 // Pattern chips — tap to select, tap again to deselect
 document.querySelectorAll('.pattern-chip').forEach(chip => {

@@ -8,6 +8,18 @@ All notable changes to Shayari Workshop are tracked here.
 
 ---
 
+## [0.7.0] — 2026-06-21
+
+### Added
+- Word Lookup tab (لغت) — separate from Behr Checker
+- Look up any Urdu word or English word/concept to get the Urdu equivalent
+- Auto-detects input language; switches textarea to RTL Nastaliq when Urdu script is typed
+- Results show: Urdu word + transliteration, English meaning, Urdu meaning, synonyms (مترادفات), antonyms (متضادات), poetic usage note (شعری استعمال)
+- Tab bar below header to switch between Behr Checker and Word Lookup
+- Service worker bumped to v5
+
+---
+
 ## [0.6.0] — 2026-06-21
 
 ### Changed

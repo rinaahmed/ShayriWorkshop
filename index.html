@@ -37,8 +37,15 @@
     </button>
   </header>
 
+  <nav class="tab-bar" role="tablist">
+    <button class="tab active" data-panel="panel-behr" role="tab" aria-selected="true">Behr Checker</button>
+    <button class="tab" data-panel="panel-lookup" role="tab" aria-selected="false">Word Lookup · لغت</button>
+  </nav>
+
+  <div id="error-message" class="message" hidden></div>
+
   <main>
-    <div id="error-message" class="message" hidden></div>
+    <div id="panel-behr" class="tab-panel">
 
     <section class="card input-section">
       <textarea
@@ -109,6 +116,26 @@
       </button>
       <div class="history-list" id="history-list" hidden></div>
     </section>
+    </div><!-- /panel-behr -->
+
+    <div id="panel-lookup" class="tab-panel" hidden>
+      <section class="card lookup-section">
+        <input
+          type="text"
+          id="word-input"
+          placeholder="محبت — mohabbat — love"
+          dir="ltr"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p class="lookup-hint">Type in Urdu script, Roman Urdu, or English</p>
+        <button id="lookup-btn" type="button">Look Up</button>
+        <p class="privacy-note">Your input never leaves this app except to the Claude API</p>
+      </section>
+
+      <section class="card lookup-results-section" id="lookup-results" hidden></section>
+    </div><!-- /panel-lookup -->
+
   </main>
 
   <div class="settings-panel" id="settings-panel" hidden role="dialog" aria-label="Settings">
