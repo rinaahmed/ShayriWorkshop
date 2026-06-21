@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shayari Workshop</title>
+  <meta name="description" content="Urdu behr (meter) checker for shayari" />
+  <meta name="theme-color" content="#4A235A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Shayari" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1 class="app-name">Shayari Workshop</h1>
+    <p class="app-subtitle" dir="rtl" lang="ur">بحر چیکر</p>
+  </header>
+
+  <main>
+    <div id="error-message" class="message" hidden></div>
+
+    <section class="card input-section">
+      <textarea
+        id="urdu-input"
+        dir="rtl"
+        lang="ur"
+        placeholder="یہاں اپنا شعر لکھیں"
+        aria-label="Enter your shayari"
+        rows="4"
+        spellcheck="false"
+      ></textarea>
+
+      <div class="pattern-input-group">
+        <label for="target-pattern">Target pattern <span class="optional">(optional)</span></label>
+        <input
+          type="text"
+          id="target-pattern"
+          placeholder="e.g. S-L-L-L S-L-L-L S-L-L-L"
+          dir="ltr"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+
+      <button id="check-btn" type="button">Check Behr</button>
+      <p class="privacy-note">Your shayari never leaves this app except to the Claude API</p>
+    </section>
+
+    <section class="card results-section" id="results" hidden>
+      <div class="syllable-strip-wrap">
+        <div class="syllable-strip" id="syllable-strip" dir="rtl" aria-label="Syllable breakdown"></div>
+      </div>
+
+      <div class="summary-row">
+        <div class="summary-item">
+          <span class="label">Total Matras</span>
+          <span class="value" id="total-matras">—</span>
+        </div>
+        <div class="summary-item summary-item--wide">
+          <span class="label">Pattern</span>
+          <span class="value pattern-value" id="pattern-display">—</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Closest Behr</span>
+          <span class="value" id="behr-name">—</span>
+        </div>
+      </div>
+
+      <p class="behr-description" id="behr-description"></p>
+
+      <div class="feet-analysis" id="feet-analysis"></div>
+
+      <div class="suggestion-box" id="suggestion-box" hidden></div>
+
+      <button id="copy-btn" type="button">Copy Pattern</button>
+    </section>
+
+    <section class="card history-section">
+      <button class="history-toggle" id="history-toggle" type="button">
+        <span class="toggle-arrow" aria-hidden="true">▸</span> History
+      </button>
+      <div class="history-list" id="history-list" hidden></div>
+    </section>
+  </main>
+
+  <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+
+  <div class="settings-panel" id="settings-panel" hidden role="dialog" aria-label="Settings">
+    <h2>Settings</h2>
+
+    <div class="setting-group">
+      <label for="api-key-input">Claude API Key</label>
+      <input
+        type="password"
+        id="api-key-input"
+        placeholder="sk-ant-..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p class="setting-hint">Stored in localStorage only — never committed to GitHub</p>
+    </div>
+
+    <div class="setting-group">
+      <label for="proxy-url-input">Cloudflare Worker URL</label>
+      <input
+        type="url"
+        id="proxy-url-input"
+        placeholder="https://shayari-proxy.yourname.workers.dev"
+        dir="ltr"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p class="setting-hint">See README for one-time setup instructions</p>
+    </div>
+
+    <div class="settings-actions">
+      <button id="save-settings" type="button">Save Settings</button>
+      <button id="clear-history" type="button" class="btn-secondary">Clear History</button>
+    </div>
+
+    <details class="about">
+      <summary>About S/L Rules</summary>
+      <ul>
+        <li>Every syllable is Short (S, 1 matra) or Long (L, 2 matras)</li>
+        <li>Syllable ending in consonant = Long (closed syllable)</li>
+        <li>Long vowels آ، او، ای = Long</li>
+        <li>Choti ye (ے) at end of syllable = Short</li>
+        <li>Bari ye (ی) = Long</li>
+        <li>Noon ghunna (ں) at end = Long</li>
+        <li>uthaana / uthaake / uthaaye = S-L-S (always)</li>
+      </ul>
+    </details>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
