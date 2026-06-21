@@ -8,6 +8,14 @@ All notable changes to Shayari Workshop are tracked here.
 
 ---
 
+## [0.4.0] — 2026-06-21
+
+### Fixed
+- Nastaliq glyphs no longer clipped in syllable tiles — increased top padding and line-height to accommodate tall ascenders
+- Nastaliq glyphs no longer clipped at right edge of history lines — added right padding for RTL start
+
+---
+
 ## [0.3.0] — 2026-06-21
 
 ### Changed

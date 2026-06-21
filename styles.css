@@ -238,12 +238,13 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.45rem 0.6rem;
+  padding: 0.65rem 0.6rem 0.45rem;
   border-radius: 8px;
   border: 2px solid;
   min-width: 44px;
   cursor: default;
   transition: transform 0.1s;
+  overflow: visible;
 }
 
 .syllable-tile:hover { transform: translateY(-2px); }
@@ -270,7 +271,7 @@ main {
   font-size: 0.95rem;
   color: var(--purple);
   direction: rtl;
-  line-height: 1.6;
+  line-height: 2;
 }
 
 .syl-marker {
@@ -448,10 +449,13 @@ main {
   color: var(--purple);
   direction: rtl;
   text-align: right;
-  line-height: 2;
+  line-height: 2.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Nastaliq glyphs extend beyond text bounds at both edges */
+  padding-right: 0.5rem;
+  padding-top: 0.2rem;
 }
 
 .hist-meta {
