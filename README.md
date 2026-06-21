@@ -1,152 +1,153 @@
 # Shayari Workshop — Behr Checker
 
-A private craft tool for checking the behr (meter) of Urdu shayari, powered by the Claude API.
+A private craft tool for checking the behr (meter) of Urdu shayari, powered by the Claude API. Paste a line of shayari, get back a syllable-by-syllable S/L breakdown, matra count, closest behr name, and a plain English suggestion for what to fix.
+
+This is a personal tool — no accounts, no sharing, no data stored on any server. Everything runs in your browser using your own API key.
 
 ---
 
-## What it does
+## What you need
 
-Paste a line of Urdu shayari. The app uses the Claude API to:
+- A **Cloudflare account** (free) — to host the app and run the CORS proxy
+- An **Anthropic API key** — to call the Claude API for analysis
 
-1. Split the line into syllables
-2. Mark each syllable as Short (S) or Long (L)
-3. Count total matras
-4. Identify the closest behr pattern
-5. Flag syllables breaking the pattern
-6. Suggest which word is the likely culprit
-
-All processing happens via your own Claude API key. Your shayari is never stored on any server.
+Both are free to get started.
 
 ---
 
-## Setup — Step by Step
+## Deployment — Step by Step
 
-You need to do two things before the app works:
+There are two Cloudflare pieces to set up:
 
-1. **Deploy the Cloudflare Worker** (one-time, ~5 minutes, free)
-2. **Get a Claude API key** (one-time)
-
-Then enter both into the app's Settings panel.
+| Piece | What it is |
+|---|---|
+| **Cloudflare Pages** | Hosts the app (HTML, CSS, JS) |
+| **Cloudflare Worker** | CORS proxy — lets the browser call the Claude API |
 
 ---
 
-### Step 1 — Deploy the Cloudflare Worker (CORS proxy)
+### Part 1 — Fork the repository
 
-The app calls the Claude API from the browser. Browsers block direct calls to external APIs (CORS policy), so we use a tiny Cloudflare Worker as a middleman. It's completely free.
+1. Go to the [ShayriWorkshop GitHub repo](https://github.com/rinaahmed/ShayriWorkshop)
+2. Click **Fork** (top right) → **Create fork**
 
-**1.1 — Create a Cloudflare account**
+You now have your own copy of the code under your GitHub account.
 
-Go to [cloudflare.com](https://cloudflare.com) and sign up for a free account. No credit card needed.
+---
 
-**1.2 — Create a new Worker**
+### Part 2 — Deploy the CORS proxy (Cloudflare Worker)
 
-- In the Cloudflare dashboard, click **Workers & Pages** in the left sidebar
-- Click **Create** → **Create Worker**
-- Give it a name, e.g. `shayari-proxy`
-- Click **Deploy** (this creates a placeholder)
+Browsers cannot call the Claude API directly due to CORS restrictions. This Worker sits in between and forwards your requests.
 
-**1.3 — Paste the Worker code**
+1. Log in to [cloudflare.com](https://cloudflare.com)
+2. In the left sidebar click **Workers & Pages**
+3. Click **Create** → **Create Worker**
+4. Give it a name, e.g. `shayari-proxy`
+5. Click **Deploy**
+6. Click **Edit code**
+7. Delete all the default code
+8. Open `proxy/worker.js` from your forked repo — copy the entire file contents and paste it into the editor
+9. Click **Deploy**
+10. Copy the Worker URL shown at the top — it looks like:
+    ```
+    https://shayari-proxy.yourname.workers.dev
+    ```
+    Keep this — you'll need it in the app settings.
 
-- After deploying, click **Edit code**
-- Select all the existing code and delete it
-- Open the file `proxy/worker.js` from this repository
-- Copy the entire contents and paste it into the editor
-- Click **Deploy** again
+---
 
-**1.4 — Copy your Worker URL**
+### Part 3 — Deploy the app (Cloudflare Pages)
 
-Your Worker URL looks like:
+1. In Cloudflare, go to **Workers & Pages**
+2. Click **Create** → **Pages** tab → **Connect to Git**
+3. Click **Connect GitHub** and authorise Cloudflare to access your GitHub
+4. Select your forked **ShayriWorkshop** repository
+5. Click **Begin setup**
+6. Leave all build settings blank — no build command, no output directory
+7. Click **Save and Deploy**
+
+Cloudflare will deploy in about 30 seconds. Your app is now live at a URL like:
 ```
-https://shayari-proxy.yourname.workers.dev
-```
-
-You'll see it displayed above the code editor. Copy it — you'll need it in the app.
-
----
-
-### Step 2 — Get a Claude API key
-
-**2.1** — Go to [console.anthropic.com](https://console.anthropic.com)
-
-**2.2** — Sign up or log in
-
-**2.3** — In the left sidebar, click **API Keys**
-
-**2.4** — Click **Create Key**, give it a name (e.g. "Shayari Workshop"), click **Create**
-
-**2.5** — Copy the key immediately — you won't be able to see it again. It starts with `sk-ant-`
-
----
-
-### Step 3 — Enter your credentials in the app
-
-- Open the app in your browser
-- Click the **gear icon ⚙️** in the bottom-right corner
-- Paste your **Claude API key** in the first field
-- Paste your **Cloudflare Worker URL** in the second field
-- Click **Save Settings**
-
-Your credentials are stored only in your browser's `localStorage`. They are never committed to GitHub or sent anywhere except Anthropic's servers (via your Worker).
-
----
-
-## Deploy to GitHub Pages
-
-**Option A — Using the GitHub website:**
-
-1. Push this repository to GitHub
-2. Go to your repo → **Settings** → **Pages** (left sidebar)
-3. Under **Source**, select **Deploy from a branch**
-4. Choose **main** branch, **/ (root)** folder
-5. Click **Save**
-6. Wait ~1 minute, then visit `https://your-username.github.io/shayriworkshop/`
-
-**Option B — Using GitHub CLI:**
-
-```bash
-git push origin main
-# Then configure Pages in the GitHub UI as above
+https://shayariworkshop.yourname.pages.dev
 ```
 
-The `.nojekyll` file in this repo tells GitHub Pages to skip Jekyll processing, which is required for the service worker to work correctly.
+> **Branch previews:** Every time you push to a non-main branch, Cloudflare Pages automatically creates a preview URL for that branch. No extra setup needed.
+
+---
+
+### Part 4 — Get a Claude API key
+
+1. Go to [console.anthropic.com](https://console.anthropic.com)
+2. Sign up or log in
+3. In the left sidebar click **API Keys**
+4. Click **Create Key**, give it a name (e.g. `Shayari Workshop`), click **Create**
+5. Copy the key immediately — it starts with `sk-ant-` and you won't see it again
+
+---
+
+### Part 5 — Enter your keys in the app
+
+1. Open your Cloudflare Pages URL in a browser
+2. Tap the **gear icon ⚙️** in the bottom-right corner
+3. In **Claude API Key** — paste your `sk-ant-...` key
+4. In **Cloudflare Worker URL** — paste your `https://shayari-proxy.yourname.workers.dev` URL
+5. Click **Save Settings**
+
+Both values are stored only in your browser's `localStorage`. They are never committed to GitHub or sent anywhere except Anthropic's servers (via your Worker).
+
+You're ready to use the app.
+
+---
+
+## Using the app
+
+1. Type or paste a line of Urdu shayari into the text area
+2. Optionally select a target behr from the chips, or type a custom pattern
+3. Tap **Check Behr**
+4. Results appear:
+   - **Syllable strip** — each syllable as a colour-coded tile (rose = Short, teal = Long)
+   - **Summary** — total matras, pattern string, closest behr name
+   - **Feet analysis** — per-foot match/mismatch
+   - **Suggestion** — plain English note on what to fix
+5. Tap **Copy Pattern** to copy the pattern string to clipboard
+6. Previous lines are saved in **History** — tap any entry to reload it
 
 ---
 
 ## Install on iPhone (PWA)
 
 1. Open the app in Safari
-2. Tap the **Share** button (box with arrow)
-3. Tap **Add to Home Screen**
-4. Tap **Add**
+2. Tap the **Share** button → **Add to Home Screen** → **Add**
 
-The app will appear on your home screen and open in full-screen mode.
+The app opens full-screen from your home screen and the shell works offline (API calls still need internet).
 
 ---
 
-## S/L Rules used
+## S/L rules used
 
-| Rule | Short (S) | Long (L) |
-|------|-----------|----------|
-| Closed syllable | — | Syllable ending in consonant |
-| Long vowels | — | آ، او، ای |
-| Choti ye (ے) at end | ✓ | — |
-| Bari ye (ی) | — | ✓ |
-| Noon ghunna (ں) at end | — | ✓ |
-| uthaana / uthaake / uthaaye | S-L-S | — |
+| Rule | Result |
+|---|---|
+| Syllable ending in a consonant | Long (L) |
+| Long vowels آ، او، ای | Long (L) |
+| Choti ye (ے) at end of syllable | Short (S) |
+| Bari ye (ی) | Long (L) |
+| Noon ghunna (ں) at end | Long (L) |
+| uthaana / uthaake / uthaaye | S-L-S (fixed) |
+| Radif (repeating refrain) | Excluded from analysis |
 
 ---
 
 ## Behr patterns recognised
 
 | Behr | Pattern | Matras |
-|------|---------|--------|
+|---|---|---|
 | Hazaj Murabbe | S-L-L-L-S-L-L-L | 14 |
 | Hazaj Musaddas | S-L-L-L-S-L-L-L-S-L-L-L | 20 |
 | Ramal Murabbe | L-S-L-L-L-S-L-L | 14 |
 | Ramal Musaddas | L-S-L-L-L-S-L-L-L-S-L-L | 20 |
 | Mutaqarib Murabbe | S-L-L-S-L-L-S-L-L-S-L-L | 16 |
 
-Near-matches within 1–2 matras are also flagged.
+Near-matches within 1–2 matras are flagged with how far off they are.
 
 ---
 
