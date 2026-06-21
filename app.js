@@ -541,6 +541,10 @@ historyToggle.addEventListener('click', () => {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
+if (window.location.hostname.includes('staging')) {
+  document.body.classList.add('env-staging');
+}
+
 loadSettings();
 renderHistory();
 
