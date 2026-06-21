@@ -8,6 +8,17 @@ All notable changes to Shayari Workshop are tracked here.
 
 ---
 
+## [0.3.0] — 2026-06-21
+
+### Changed
+- Target pattern field now shows clickable chips for all 5 built-in behr patterns (Hazaj Murabbe, Hazaj Musaddas, Ramal Murabbe, Ramal Musaddas, Mutaqarib)
+- Tapping a chip fills the pattern input and highlights the selection in gold
+- Tapping the same chip again clears the selection
+- Typing in the free-text field deselects any active chip
+- Free-text entry still supported for custom patterns
+
+---
+
 ## [0.2.0] — 2026-06-21
 
 ### Fixed

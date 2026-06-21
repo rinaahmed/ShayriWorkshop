@@ -39,11 +39,18 @@
       ></textarea>
 
       <div class="pattern-input-group">
-        <label for="target-pattern">Target pattern <span class="optional">(optional)</span></label>
+        <label>Target pattern <span class="optional">(optional)</span></label>
+        <div class="pattern-chips" id="pattern-chips">
+          <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L">Hazaj Murabbe</button>
+          <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L-S-L-L-L">Hazaj Musaddas</button>
+          <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L">Ramal Murabbe</button>
+          <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L-L-S-L-L">Ramal Musaddas</button>
+          <button class="pattern-chip" type="button" data-pattern="S-L-L-S-L-L-S-L-L-S-L-L">Mutaqarib</button>
+        </div>
         <input
           type="text"
           id="target-pattern"
-          placeholder="e.g. S-L-L-L S-L-L-L S-L-L-L"
+          placeholder="or type your own e.g. S-L-L-L S-L-L-L"
           dir="ltr"
           autocomplete="off"
           spellcheck="false"
