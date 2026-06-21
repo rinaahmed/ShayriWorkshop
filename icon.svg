@@ -1,15 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Background -->
-  <rect width="512" height="512" rx="100" fill="#4A235A"/>
+  <rect width="512" height="512" rx="110" fill="#4A1C0E"/>
 
-  <!-- Ink drop shape -->
-  <path d="M256 100 C256 100 160 200 160 300 C160 355 203 400 256 400 C309 400 352 355 352 300 C352 200 256 100 256 100Z"
-        fill="#B8860B"/>
+  <!-- Outer diamond -->
+  <path d="M256 72 L440 256 L256 440 L72 256 Z"
+        fill="none" stroke="#C4943A" stroke-width="16"/>
 
-  <!-- Inner highlight -->
-  <path d="M256 160 C256 160 200 230 200 300 C200 333 225 358 256 362 C287 358 312 333 312 300 C312 230 256 160 256 160Z"
-        fill="#FDFAF0" opacity="0.18"/>
+  <!-- Inner diamond filled -->
+  <path d="M256 152 L360 256 L256 360 L152 256 Z"
+        fill="#C4943A" opacity="0.28"/>
 
-  <!-- Small circle at top of drop -->
-  <circle cx="256" cy="118" r="18" fill="#D4A017"/>
+  <!-- Inner diamond outline -->
+  <path d="M256 152 L360 256 L256 360 L152 256 Z"
+        fill="none" stroke="#C4943A" stroke-width="10"/>
+
+  <!-- Centre dot -->
+  <circle cx="256" cy="256" r="20" fill="#C4943A"/>
 </svg>

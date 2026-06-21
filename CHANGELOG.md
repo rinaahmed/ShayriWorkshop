@@ -8,6 +8,20 @@ All notable changes to Shayari Workshop are tracked here.
 
 ---
 
+## [0.5.0] — 2026-06-21
+
+### Changed
+- Full visual redesign to match warm earthy aesthetic
+- New color palette: deep brown header `#4A1C0E`, cream background `#F5F0E8`, rust/terracotta `#8B2F1F` accent replacing purple/gold for interactive elements
+- Header redesigned: dark brown band with diamond logo, Urdu app name in Nastaliq, settings gear moved into header (removed bottom FAB)
+- Check button, save settings, and active pattern chips now use rust/terracotta
+- New diamond logo icon — gold concentric diamonds on dark brown background, used as PWA icon and header mark
+- Suggestion box retains gold left border as informational accent
+- Mismatch indicators in feet analysis now use rust instead of rose
+- Hover states throughout updated to rust
+
+---
+
 ## [0.4.0] — 2026-06-21
 
 ### Fixed
