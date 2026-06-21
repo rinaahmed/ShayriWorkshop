@@ -8,6 +8,23 @@ All notable changes to Shayari Workshop are tracked here.
 
 ---
 
+## [0.6.0] — 2026-06-21
+
+### Changed
+- Design overhaul to match handoff specification
+- Color palette refined: header `#4D1209`, page bg `#EDE8DF`, gold `#C8922A`, crimson CTA `#8B2820`
+- Header diagonal stripe texture added (repeating 135° linear gradient)
+- Header subtitle changed from uppercase sans to Playfair Display Italic 13px, color `#C4A882`
+- Logo updated to outline-only rotated square (no fill, no centre dot)
+- Pattern chip selected state changed to dark charcoal fill (`#1C1A18` bg, white text)
+- Custom pattern input border updated to 1.5px `#D8CEC0`, radius 10px, focus highlight uses crimson
+- Check Behr button border-radius increased to 13px
+- Added DM Sans (UI font) and DM Mono (monospace) and Playfair Display to Google Fonts import
+- PWA icon updated to match new outline-only diamond logo on `#4D1209` background
+- Service worker bumped to v4 to invalidate stale caches
+
+---
+
 ## [0.5.0] — 2026-06-21
 
 ### Changed
