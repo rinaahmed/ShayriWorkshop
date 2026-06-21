@@ -60,21 +60,12 @@ body {
 }
 
 .app-name {
-  font-family: var(--font-urdu);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #F5E6C8;
-  direction: rtl;
-  line-height: 2.2;
-  padding-top: 0.2rem;
-}
-
-.app-subtitle {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 0.8125rem;
-  color: #C4A882;
-  margin-top: -0.1rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #F5E6C8;
+  line-height: 1.25;
 }
 
 .header-settings-btn {
@@ -573,8 +564,202 @@ main {
   line-height: 1.9;
 }
 
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.tab.active {
+  color: var(--rust);
+  border-bottom-color: var(--rust);
+  font-weight: 600;
+}
+
+.tab:hover:not(.active) { color: var(--text); }
+
+/* ── Word Lookup ── */
+.lookup-section { padding: 1.25rem; }
+
+#word-input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1.5px solid #D8CEC0;
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--text);
+  background: transparent;
+  outline: none;
+  transition: border-color 0.15s;
+}
+#word-input:focus { border-color: var(--rust); }
+#word-input.urdu-mode {
+  font-family: var(--font-urdu);
+  font-size: 1.3rem;
+  line-height: 2.2;
+  text-align: right;
+}
+
+.lookup-hint {
+  font-size: 0.67rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+#lookup-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.875rem;
+  background: var(--rust);
+  color: #fff;
+  border: none;
+  border-radius: 13px;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+#lookup-btn:hover:not(:disabled) { background: #6e2518; }
+#lookup-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.lookup-results-section { padding: 1.25rem; }
+
+.lookup-word-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.lookup-word-urdu {
+  font-family: var(--font-urdu);
+  font-size: 2rem;
+  color: var(--text);
+  line-height: 2;
+  direction: rtl;
+}
+
+.lookup-word-roman {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.lookup-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  background: var(--gold-light);
+  color: var(--gold);
+  border: 1px solid rgba(200, 146, 42, 0.3);
+}
+
+.lookup-meanings { margin-bottom: 1rem; }
+
+.lookup-meaning-en {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.lookup-meaning-ur {
+  font-family: var(--font-urdu);
+  font-size: 1rem;
+  color: var(--text-muted);
+  direction: rtl;
+  line-height: 1.8;
+}
+
+.lookup-group { margin-bottom: 1rem; }
+
+.lookup-group-title {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.5rem;
+}
+
+.lookup-word-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.lookup-word-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.625rem;
+  border-radius: 6px;
+  background: rgba(58, 26, 10, 0.03);
+  flex-wrap: wrap;
+}
+
+.lookup-item-urdu {
+  font-family: var(--font-urdu);
+  font-size: 1rem;
+  color: var(--text);
+  direction: rtl;
+  line-height: 1.8;
+}
+
+.lookup-item-roman {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.lookup-item-meaning {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.lookup-poetic-note {
+  border-left: 3px solid var(--gold);
+  padding: 0.75rem 1rem;
+  background: var(--gold-light);
+  border-radius: 0 6px 6px 0;
+  margin-top: 0.875rem;
+}
+.lookup-poetic-note p {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
 /* ── Responsive ── */
 @media (max-width: 360px) {
   #urdu-input { font-size: 1.1rem; }
-  .app-name   { font-size: 1.35rem; }
+  .app-name   { font-size: 1.2rem; }
 }
