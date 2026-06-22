@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "_schema": {
+    "surface": "the Urdu-script word exactly as it appears (the lookup key)",
+    "translit": "ShayriRoman transcription (see docs/03_transcription.md). Engine derives the weight from this.",
+    "morae": "OPTIONAL explicit weight override, e.g. [1] or [2,1]. If present it is AUTHORITATIVE and the engine ignores translit. Use ONLY for idiosyncratic words whose metric value is not predictable from pronunciation (function words like ye/woh, and any word you have hand-corrected).",
+    "note": "free text, why this entry exists / which reading",
+    "source": "seed | llm | user",
+    "confirmed": "true once a human (you) has verified it; false for machine guesses awaiting review"
+  },
+  "_notes": [
+    "This is a SEED, not a verified corpus. Treat confirmed:false as 'needs your eye'.",
+    "Most words need only `translit`; the engine handles them. Reserve `morae` for true exceptions.",
+    "The app must let you edit/confirm entries from the UI and persist them to IndexedDB.",
+    "Words that previously needed hard-coded fixes (uthaana/uthaake/uthaaye) are handled correctly by the engine from translit alone — included here as confirmed examples, no override needed."
+  ],
+  "entries": [
+    { "surface": "یہ",   "translit": "ye",    "morae": [1], "note": "function word, metrically light", "source": "seed", "confirmed": false },
+    { "surface": "وہ",   "translit": "woh",   "morae": [2], "note": "function word; sometimes light — verify per line", "source": "seed", "confirmed": false },
+    { "surface": "کہ",   "translit": "keh",   "morae": [1], "note": "conjunction, light", "source": "seed", "confirmed": false },
+    { "surface": "نہ",   "translit": "na",    "morae": [1], "note": "negation, light", "source": "seed", "confirmed": false },
+    { "surface": "بھی",  "translit": "bhii",  "morae": [2], "note": "", "source": "seed", "confirmed": false },
+    { "surface": "ہی",   "translit": "hii",   "morae": [2], "note": "", "source": "seed", "confirmed": false },
+    { "surface": "تو",   "translit": "to",    "morae": [2], "note": "as 'then/so'; as 'tuu' (you) also [2]", "source": "seed", "confirmed": false },
+    { "surface": "سے",   "translit": "se",    "morae": [2], "note": "postposition; can be light in some readings", "source": "seed", "confirmed": false },
+    { "surface": "میں",  "translit": "me~",   "morae": [2], "note": "postposition 'in'; the pronoun 'main' is also [2]", "source": "seed", "confirmed": false },
+    { "surface": "کو",   "translit": "ko",    "morae": [2], "note": "", "source": "seed", "confirmed": false },
+    { "surface": "نے",   "translit": "ne",    "morae": [1], "note": "ergative marker, light", "source": "seed", "confirmed": false },
+
+    { "surface": "دل",    "translit": "dil",     "source": "seed", "confirmed": true },
+    { "surface": "غم",    "translit": "gham",    "source": "seed", "confirmed": true },
+    { "surface": "عشق",   "translit": "ishq",    "note": "over-long: [2,1]", "source": "seed", "confirmed": true },
+    { "surface": "حسن",   "translit": "husn",    "note": "[2,1]", "source": "seed", "confirmed": false },
+    { "surface": "شب",    "translit": "shab",    "source": "seed", "confirmed": true },
+    { "surface": "بات",   "translit": "baat",    "note": "over-long: [2,1]", "source": "seed", "confirmed": true },
+    { "surface": "ساتھ",  "translit": "saath",   "note": "over-long: [2,1] (the 'th' is one aspirate consonant)", "source": "seed", "confirmed": true },
+    { "surface": "راہ",   "translit": "raah",    "note": "over-long: [2,1]", "source": "seed", "confirmed": false },
+    { "surface": "چاند",  "translit": "chaand",  "note": "[2,1]", "source": "seed", "confirmed": false },
+    { "surface": "آنکھ",  "translit": "aankh",   "note": "nasal + aspirate; [2,1]", "source": "seed", "confirmed": false },
+    { "surface": "درد",   "translit": "dard",    "note": "CVCC over-long: [2,1]", "source": "seed", "confirmed": true },
+    { "surface": "جاں",   "translit": "jaa~",    "note": "nasal long, no coda: [2]", "source": "seed", "confirmed": true },
+    { "surface": "جان",   "translit": "jaan",    "note": "[2,1]", "source": "seed", "confirmed": false },
+    { "surface": "تم",    "translit": "tum",     "source": "seed", "confirmed": true },
+    { "surface": "ہم",    "translit": "ham",     "source": "seed", "confirmed": true },
+    { "surface": "محبت",  "translit": "muhabbat","note": "mu-hab-bat, gemination on b: [1,2,2]", "source": "seed", "confirmed": false },
+    { "surface": "زندگی", "translit": "zindagii","note": "zin-da-gii: [2,1,2]", "source": "seed", "confirmed": false },
+    { "surface": "خواب",  "translit": "khvaab",  "note": "[2,1]", "source": "seed", "confirmed": false },
+    { "surface": "نظر",   "translit": "nazar",   "note": "na-zar: [1,2]", "source": "seed", "confirmed": false },
+    { "surface": "اٹھانا","translit": "uthaana", "note": "u-thaa-na: [1,2,1]. Engine derives this correctly — no override needed (was a hard-coded special case in v1).", "source": "seed", "confirmed": true },
+    { "surface": "اٹھاکے","translit": "uthaake",  "note": "[1,2,1]", "source": "seed", "confirmed": true },
+    { "surface": "اٹھائے","translit": "uthaaye",  "note": "[1,2,1]", "source": "seed", "confirmed": true }
+  ]
+}

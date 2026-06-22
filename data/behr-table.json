@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "notation": {
+    "units": "pattern is a flat array of mora units: 1 = short (S), 2 = long (L)",
+    "matras": "sum of the pattern",
+    "anceps": "the final unit is free (S or L) at line end; the matcher ignores a final-position mismatch",
+    "overlong": "an over-long syllable (e.g. saath, dard) contributes 2 then 1 to the line pattern",
+    "confidence": "from-app = copied verbatim from the existing app; standard = textbook arkan derivation; verify = common but please confirm against your own corpus before trusting"
+  },
+  "_howToExtend": "Add a row with id, name, arkan (human note), pattern (array of 1/2). The matcher reads `pattern` only; everything else is documentation. To add a zihaf variant, add it as its own row with its own full pattern — the matcher finds the closest, so you do not need a zihaf engine.",
+  "behrs": [
+    {
+      "id": "app_hazaj_murabba",
+      "name": "Hazaj Murabbe (app v1)",
+      "arkan": "mafaa'iilun x2  (S L L L)x2",
+      "pattern": [1,2,2,2,1,2,2,2],
+      "confidence": "from-app",
+      "notes": "Original app entry. Matras 14."
+    },
+    {
+      "id": "app_hazaj_musaddas",
+      "name": "Hazaj Musaddas (app v1)",
+      "arkan": "mafaa'iilun x3  (S L L L)x3",
+      "pattern": [1,2,2,2,1,2,2,2,1,2,2,2],
+      "confidence": "from-app",
+      "notes": "Original app entry. Matras 20."
+    },
+    {
+      "id": "app_ramal_murabba",
+      "name": "Ramal Murabbe (app v1)",
+      "arkan": "faa'ilaatun x2  (L S L L)x2",
+      "pattern": [2,1,2,2,2,1,2,2],
+      "confidence": "from-app",
+      "notes": "Original app entry. Matras 14."
+    },
+    {
+      "id": "app_ramal_musaddas",
+      "name": "Ramal Musaddas (app v1)",
+      "arkan": "faa'ilaatun x3  (L S L L)x3",
+      "pattern": [2,1,2,2,2,1,2,2,2,1,2,2],
+      "confidence": "from-app",
+      "notes": "Original app entry. Matras 20."
+    },
+    {
+      "id": "app_mutaqarib_murabba",
+      "name": "Mutaqarib Murabbe (app v1)",
+      "arkan": "fa'uulun x4  (S L L)x4",
+      "pattern": [1,2,2,1,2,2,1,2,2,1,2,2],
+      "confidence": "from-app",
+      "notes": "Original app entry. Matras 16. Equivalent to Mutaqarib musamman saalim."
+    },
+
+    {
+      "id": "mutadaarik_musamman_salim",
+      "name": "Mutadaarik Musamman Saalim",
+      "arkan": "faa'ilun x4  (L S L)x4",
+      "pattern": [2,1,2,2,1,2,2,1,2,2,1,2],
+      "confidence": "standard",
+      "notes": "Matras 20."
+    },
+    {
+      "id": "ramal_musamman_mahzuf",
+      "name": "Ramal Musamman Mahzuf",
+      "arkan": "faa'ilaatun x3 + faa'ilun  (L S L L)x3 (L S L)",
+      "pattern": [2,1,2,2,2,1,2,2,2,1,2,2,2,1,2],
+      "confidence": "standard",
+      "notes": "Very common ghazal meter. Matras 26."
+    },
+    {
+      "id": "ramal_musaddas_mahzuf",
+      "name": "Ramal Musaddas Mahzuf",
+      "arkan": "faa'ilaatun x2 + faa'ilun  (L S L L)x2 (L S L)",
+      "pattern": [2,1,2,2,2,1,2,2,2,1,2],
+      "confidence": "standard",
+      "notes": "Very common ghazal meter. Matras 19."
+    },
+    {
+      "id": "hazaj_musaddas_mahzuf",
+      "name": "Hazaj Musaddas Mahzuf",
+      "arkan": "mafaa'iilun x2 + fa'uulun  (S L L L)x2 (S L L)",
+      "pattern": [1,2,2,2,1,2,2,2,1,2,2],
+      "confidence": "standard",
+      "notes": "Very common ghazal meter. Matras 17."
+    },
+    {
+      "id": "mutaqarib_musamman_mahzuf",
+      "name": "Mutaqarib Musamman Mahzuf",
+      "arkan": "fa'uulun x3 + fa'uul  (S L L)x3 (S L)",
+      "pattern": [1,2,2,1,2,2,1,2,2,1,2],
+      "confidence": "standard",
+      "notes": "Matras 18."
+    },
+    {
+      "id": "rajaz_musamman_salim",
+      "name": "Rajaz Musamman Saalim",
+      "arkan": "mustaf'ilun x4  (L L S L)x4",
+      "pattern": [2,2,1,2,2,2,1,2,2,2,1,2,2,2,1,2],
+      "confidence": "standard",
+      "notes": "Matras 28."
+    },
+    {
+      "id": "kaamil_musamman_salim",
+      "name": "Kaamil Musamman Saalim",
+      "arkan": "mutafaa'ilun x4  (S S L S L)x4",
+      "pattern": [1,1,2,1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1,2],
+      "confidence": "standard",
+      "notes": "Matras 28."
+    },
+
+    {
+      "id": "mujtas_musamman_makhbun_mahzuf",
+      "name": "Mujtas Musamman Makhbun Mahzuf",
+      "arkan": "mafaa'ilun fa'ilaatun mafaa'ilun fa'ilun  (S L S L)(S S L L)(S L S L)(S S L)",
+      "pattern": [1,2,1,2,1,1,2,2,1,2,1,2,1,1,2],
+      "confidence": "verify",
+      "notes": "Extremely common in modern ghazal (much of Faiz). Matras 22. Confirm the makhbun foot weights against your corpus."
+    },
+    {
+      "id": "khafeef_musaddas_makhbun_mahzuf",
+      "name": "Khafeef Musaddas Makhbun Mahzuf",
+      "arkan": "faa'ilaatun mafaa'ilun fa'ilun  (L S L L)(S L S L)(S S L)",
+      "pattern": [2,1,2,2,1,2,1,2,1,1,2],
+      "confidence": "verify",
+      "notes": "Common ghazal meter. Matras 17. Multiple legal variants exist; add rows as needed."
+    },
+    {
+      "id": "muzaari_musamman_akhrab",
+      "name": "Muzaari' Musamman Akhrab",
+      "arkan": "maf'uulu faa'ilaatun maf'uulu faa'ilaatun  (L L S)(L S L L)(L L S)(L S L L)",
+      "pattern": [2,2,1,2,1,2,2,2,2,1,2,1,2,2],
+      "confidence": "verify",
+      "notes": "Common. Matras 26. Confirm against corpus."
+    }
+  ]
+}

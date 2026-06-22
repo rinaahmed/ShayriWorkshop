@@ -1,13 +1,16 @@
-const CACHE = 'shayari-workshop-v9';
+const CACHE = 'shayari-workshop-v10';
 
 const SHELL = [
   './',
   './index.html',
-  './behr-engine.js',
+  './mora-engine.js',
+  './storage.js',
   './app.js',
   './styles.css',
   './manifest.json',
   './icon.svg',
+  './data/behr-table.json',
+  './data/seed-dictionary.json',
 ];
 
 self.addEventListener('install', e => {

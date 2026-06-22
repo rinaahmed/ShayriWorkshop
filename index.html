@@ -37,86 +37,95 @@
   </header>
 
   <nav class="tab-bar" role="tablist">
-    <button class="tab active" data-panel="panel-behr" role="tab" aria-selected="true">Behr Checker</button>
-    <button class="tab" data-panel="panel-lookup" role="tab" aria-selected="false">Word Lookup · لغت</button>
+    <button class="tab active" data-panel="panel-behr"   role="tab" aria-selected="true">Behr Checker</button>
+    <button class="tab"        data-panel="panel-lookup" role="tab" aria-selected="false">Word Lookup · لغت</button>
+    <button class="tab"        data-panel="panel-dict"   role="tab" aria-selected="false">Dictionary · فرہنگ</button>
   </nav>
 
   <div id="error-message" class="message" hidden></div>
 
   <main>
+
+    <!-- ── Behr Checker panel ── -->
     <div id="panel-behr" class="tab-panel">
 
-    <section class="card input-section">
-      <textarea
-        id="urdu-input"
-        dir="rtl"
-        lang="ur"
-        placeholder="یہاں اپنا شعر لکھیں"
-        aria-label="Enter your shayari"
-        rows="3"
-        spellcheck="false"
-      ></textarea>
-
-      <div class="pattern-input-group">
-        <label>Target pattern <span class="optional">(optional)</span></label>
-        <div class="pattern-chips" id="pattern-chips">
-          <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L">Hazaj Murabbe</button>
-          <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L-S-L-L-L">Hazaj Musaddas</button>
-          <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L">Ramal Murabbe</button>
-          <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L-L-S-L-L">Ramal Musaddas</button>
-          <button class="pattern-chip" type="button" data-pattern="S-L-L-S-L-L-S-L-L-S-L-L">Mutaqarib</button>
-        </div>
-        <input
-          type="text"
-          id="target-pattern"
-          placeholder="or type your own e.g. S-L-L-L S-L-L-L"
-          dir="ltr"
-          autocomplete="off"
+      <section class="card input-section">
+        <textarea
+          id="urdu-input"
+          dir="rtl"
+          lang="ur"
+          placeholder="یہاں اپنا شعر لکھیں"
+          aria-label="Enter your shayari"
+          rows="3"
           spellcheck="false"
-        />
-      </div>
+        ></textarea>
 
-      <button id="check-btn" type="button">Check Behr</button>
-      <p class="privacy-note">Your shayari never leaves this app except to the Claude API</p>
-    </section>
-
-    <section class="card results-section" id="results" hidden>
-      <div class="syllable-strip-wrap">
-        <div class="syllable-strip" id="syllable-strip" dir="rtl" aria-label="Syllable breakdown"></div>
-      </div>
-
-      <div class="summary-row">
-        <div class="summary-item">
-          <span class="label">Total Matras</span>
-          <span class="value" id="total-matras">—</span>
+        <div class="pattern-input-group">
+          <label>Target pattern <span class="optional">(optional)</span></label>
+          <div class="pattern-chips" id="pattern-chips">
+            <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L">Hazaj Murabbe</button>
+            <button class="pattern-chip" type="button" data-pattern="S-L-L-L-S-L-L-L-S-L-L-L">Hazaj Musaddas</button>
+            <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L">Ramal Murabbe</button>
+            <button class="pattern-chip" type="button" data-pattern="L-S-L-L-L-S-L-L-L-S-L-L">Ramal Musaddas</button>
+            <button class="pattern-chip" type="button" data-pattern="S-L-L-S-L-L-S-L-L-S-L-L">Mutaqarib</button>
+          </div>
+          <input
+            type="text"
+            id="target-pattern"
+            placeholder="or type your own e.g. S-L-L-L S-L-L-L"
+            dir="ltr"
+            autocomplete="off"
+            spellcheck="false"
+          />
         </div>
-        <div class="summary-item summary-item--wide">
-          <span class="label">Pattern</span>
-          <span class="value pattern-value" id="pattern-display">—</span>
+
+        <button id="check-btn" type="button">Check Behr</button>
+        <p class="privacy-note">Unknown words are sent to the Claude API once, then cached locally forever</p>
+      </section>
+
+      <!-- Confirmation bar for newly transcribed words -->
+      <section class="card confirm-bar" id="confirm-bar" hidden>
+      </section>
+
+      <section class="card results-section" id="results" hidden>
+        <div class="syllable-strip-wrap">
+          <div class="syllable-strip" id="syllable-strip" dir="rtl" aria-label="Syllable breakdown"></div>
         </div>
-        <div class="summary-item">
-          <span class="label">Closest Behr</span>
-          <span class="value" id="behr-name">—</span>
+
+        <div class="summary-row">
+          <div class="summary-item">
+            <span class="label">Total Matras</span>
+            <span class="value" id="total-matras">—</span>
+          </div>
+          <div class="summary-item summary-item--wide">
+            <span class="label">Pattern</span>
+            <span class="value pattern-value" id="pattern-display">—</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Closest Behr</span>
+            <span class="value" id="behr-name">—</span>
+          </div>
         </div>
-      </div>
 
-      <p class="behr-description" id="behr-description"></p>
+        <p class="behr-description" id="behr-description"></p>
 
-      <div class="feet-analysis" id="feet-analysis"></div>
+        <div class="feet-analysis" id="feet-analysis"></div>
 
-      <div class="suggestion-box" id="suggestion-box" hidden></div>
+        <div class="suggestion-box" id="suggestion-box" hidden></div>
 
-      <button id="copy-btn" type="button">Copy Pattern</button>
-    </section>
+        <button id="copy-btn" type="button">Copy Pattern</button>
+      </section>
 
-    <section class="card history-section">
-      <button class="history-toggle" id="history-toggle" type="button">
-        <span class="toggle-arrow" aria-hidden="true">▸</span> History
-      </button>
-      <div class="history-list" id="history-list" hidden></div>
-    </section>
+      <section class="card history-section">
+        <button class="history-toggle" id="history-toggle" type="button">
+          <span class="toggle-arrow" aria-hidden="true">▸</span> History
+        </button>
+        <div class="history-list" id="history-list" hidden></div>
+      </section>
+
     </div><!-- /panel-behr -->
 
+    <!-- ── Word Lookup panel ── -->
     <div id="panel-lookup" class="tab-panel" hidden>
       <section class="card lookup-section">
         <input
@@ -131,12 +140,27 @@
         <button id="lookup-btn" type="button">Look Up</button>
         <p class="privacy-note">Your input never leaves this app except to the Claude API</p>
       </section>
-
       <section class="card lookup-results-section" id="lookup-results" hidden></section>
     </div><!-- /panel-lookup -->
 
+    <!-- ── Dictionary panel ── -->
+    <div id="panel-dict" class="tab-panel" hidden>
+      <section class="card dict-section">
+        <div class="dict-header">
+          <input type="text" id="dict-search" class="dict-search" placeholder="Search…" autocomplete="off" />
+          <button id="dict-filter-all"    class="dict-filter-btn active">All</button>
+          <button id="dict-filter-unconf" class="dict-filter-btn">Unconfirmed</button>
+          <button id="dict-export-btn"    class="btn-secondary dict-action-btn">Export</button>
+          <button id="dict-import-btn"    class="btn-secondary dict-action-btn">Import</button>
+          <input type="file" id="dict-import-file" accept=".json" hidden />
+        </div>
+        <div id="dict-list" class="dict-list"></div>
+      </section>
+    </div><!-- /panel-dict -->
+
   </main>
 
+  <!-- ── Settings panel ── -->
   <div class="settings-panel" id="settings-panel" hidden role="dialog" aria-label="Settings">
     <h2>Settings</h2>
 
@@ -171,20 +195,23 @@
     </div>
 
     <details class="about">
-      <summary>About S/L Rules</summary>
+      <summary>About the Behr Engine</summary>
       <ul>
-        <li>Every syllable is Short (S, 1 matra) or Long (L, 2 matras)</li>
-        <li>Syllable ending in consonant = Long (closed syllable)</li>
-        <li>Long vowels آ، او، ای = Long</li>
-        <li>Choti ye (ے) at end of syllable = Short</li>
-        <li>Bari ye (ی) = Long</li>
-        <li>Noon ghunna (ں) at end = Long</li>
-        <li>uthaana / uthaake / uthaaye = S-L-S (always)</li>
+        <li>Words are looked up in a local dictionary (IndexedDB)</li>
+        <li>Unknown words are transcribed by Claude once, then cached forever</li>
+        <li>Weight counting and behr matching are pure local algorithms</li>
+        <li>Over-long syllables (ساتھ، درد) contribute L then S (2+1 morae)</li>
+        <li>Confirm/edit words to lock their weight permanently</li>
+        <li>Same line always gives identical output after all words are confirmed</li>
       </ul>
     </details>
   </div>
 
-  <script src="behr-engine.js"></script>
+  <!-- ── Edit popover ── -->
+  <div id="edit-popover" class="edit-popover" hidden role="dialog" aria-label="Edit word"></div>
+
+  <script src="mora-engine.js"></script>
+  <script src="storage.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
