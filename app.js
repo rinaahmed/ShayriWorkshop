@@ -80,7 +80,8 @@ const behrDescEl    = $('behr-description');
 const feetEl        = $('feet-analysis');
 const suggEl        = $('suggestion-box');
 const copyBtn       = $('copy-btn');
-const settingsBtn   = $('settings-btn');
+const moreBtn       = $('more-btn');
+const moreMenu      = $('more-menu');
 const settingsPanel = $('settings-panel');
 const apiKeyInput   = $('api-key-input');
 const proxyUrlInput = $('proxy-url-input');
@@ -927,8 +928,6 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.setAttribute('aria-selected', 'true');
     $(tab.dataset.panel).hidden = false;
     hideMsg();
-
-    if (tab.dataset.panel === 'panel-dict') renderDictionary();
   });
 });
 
@@ -976,17 +975,50 @@ copyBtn.addEventListener('click', () => {
   }).catch(() => showMsg('Copy failed — please select and copy manually'));
 });
 
-settingsBtn.addEventListener('click', e => {
+// ── More menu ─────────────────────────────────────────────────────────────────
+function closeAllPanels() {
+  moreMenu.hidden      = true;
+  settingsPanel.hidden = true;
+}
+
+moreBtn.addEventListener('click', e => {
   e.stopPropagation();
-  settingsPanel.hidden = !settingsPanel.hidden;
+  const opening = moreMenu.hidden;
+  closeAllPanels();
+  moreMenu.hidden = !opening;
 });
 
+$('menu-settings').addEventListener('click', () => {
+  moreMenu.hidden = true;
+  settingsPanel.hidden = false;
+});
+
+$('menu-dict').addEventListener('click', () => {
+  moreMenu.hidden = true;
+  $('panel-dict').hidden = false;
+  renderDictionary();
+});
+
+$('menu-help').addEventListener('click', () => {
+  moreMenu.hidden = true;
+  $('panel-help').hidden = false;
+});
+
+$('dict-close').addEventListener('click', () => { $('panel-dict').hidden = true; });
+$('help-close').addEventListener('click', () => { $('panel-help').hidden = true; });
+
 document.addEventListener('click', e => {
+  // Close more menu when clicking outside
+  if (!moreMenu.hidden && !moreMenu.contains(e.target) && e.target !== moreBtn) {
+    moreMenu.hidden = true;
+  }
+  // Close settings panel when clicking outside
   if (!settingsPanel.hidden &&
       !settingsPanel.contains(e.target) &&
-      e.target !== settingsBtn) {
+      e.target !== moreBtn) {
     settingsPanel.hidden = true;
   }
+  // Close edit popover when clicking outside
   if (editPopover && !editPopover.hidden &&
       !editPopover.contains(e.target) &&
       !e.target.classList.contains('syllable-edit-btn') &&
@@ -997,7 +1029,10 @@ document.addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (!settingsPanel.hidden) settingsPanel.hidden = true;
+    moreMenu.hidden      = true;
+    settingsPanel.hidden = true;
+    $('panel-dict').hidden = true;
+    $('panel-help').hidden = true;
     if (editPopover && !editPopover.hidden) editPopover.hidden = true;
   }
 });

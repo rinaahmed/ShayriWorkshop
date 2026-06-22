@@ -28,18 +28,44 @@
     <div class="header-title">
       <h1 class="app-name">Shayari Workshop</h1>
     </div>
-    <button class="header-settings-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    <button class="header-more-btn" id="more-btn" type="button" aria-label="More options" title="More">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <circle cx="12" cy="5"  r="2"/>
+        <circle cx="12" cy="12" r="2"/>
+        <circle cx="12" cy="19" r="2"/>
       </svg>
     </button>
   </header>
 
+  <!-- ── More menu dropdown ── -->
+  <div id="more-menu" class="more-menu" hidden role="menu">
+    <button class="more-menu-item" id="menu-settings" role="menuitem">
+      <svg class="more-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+      Settings
+    </button>
+    <button class="more-menu-item" id="menu-dict" role="menuitem">
+      <svg class="more-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      Dictionary · فرہنگ
+    </button>
+    <button class="more-menu-item" id="menu-help" role="menuitem">
+      <svg class="more-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      Help &amp; Manual
+    </button>
+  </div>
+
   <nav class="tab-bar" role="tablist">
     <button class="tab active" data-panel="panel-behr"   role="tab" aria-selected="true">Behr Checker</button>
     <button class="tab"        data-panel="panel-lookup" role="tab" aria-selected="false">Word Lookup · لغت</button>
-    <button class="tab"        data-panel="panel-dict"   role="tab" aria-selected="false">Dictionary · فرہنگ</button>
   </nav>
 
   <div id="error-message" class="message" hidden></div>
@@ -83,13 +109,11 @@
         <p class="privacy-note">Unknown words are sent to the Claude API once, then cached locally forever</p>
       </section>
 
-      <!-- Confirmation bar for newly transcribed words -->
-      <section class="card confirm-bar" id="confirm-bar" hidden>
-      </section>
+      <!-- Confirmation bar -->
+      <section class="card confirm-bar" id="confirm-bar" hidden></section>
 
-      <!-- Reading chooser for ambiguous words (multiple pronunciations) -->
-      <section class="card chooser-section" id="reading-chooser" hidden>
-      </section>
+      <!-- Reading chooser -->
+      <section class="card chooser-section" id="reading-chooser" hidden></section>
 
       <section class="card results-section" id="results" hidden>
         <div class="syllable-strip-wrap">
@@ -117,11 +141,8 @@
         </div>
 
         <p class="behr-description" id="behr-description"></p>
-
         <div class="feet-analysis" id="feet-analysis"></div>
-
         <div class="suggestion-box" id="suggestion-box" hidden></div>
-
         <button id="copy-btn" type="button">Copy Pattern</button>
       </section>
 
@@ -152,72 +173,218 @@
       <section class="card lookup-results-section" id="lookup-results" hidden></section>
     </div><!-- /panel-lookup -->
 
-    <!-- ── Dictionary panel ── -->
-    <div id="panel-dict" class="tab-panel" hidden>
-      <section class="card dict-section">
-        <div class="dict-header">
-          <input type="text" id="dict-search" class="dict-search" placeholder="Search…" autocomplete="off" />
-          <button id="dict-filter-all"    class="dict-filter-btn active">All</button>
-          <button id="dict-filter-unconf" class="dict-filter-btn">Unconfirmed</button>
-          <button id="dict-export-btn"    class="btn-secondary dict-action-btn">Export</button>
-          <button id="dict-import-btn"    class="btn-secondary dict-action-btn">Import</button>
-          <input type="file" id="dict-import-file" accept=".json" hidden />
-        </div>
-        <div id="dict-list" class="dict-list"></div>
-      </section>
-    </div><!-- /panel-dict -->
-
   </main>
 
-  <!-- ── Settings panel ── -->
+  <!-- ── Settings panel (floating card) ── -->
   <div class="settings-panel" id="settings-panel" hidden role="dialog" aria-label="Settings">
     <h2>Settings</h2>
-
     <div class="setting-group">
       <label for="api-key-input">Claude API Key</label>
-      <input
-        type="password"
-        id="api-key-input"
-        placeholder="sk-ant-..."
-        autocomplete="off"
-        spellcheck="false"
-      />
+      <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false" />
       <p class="setting-hint">Stored in localStorage only — never committed to GitHub</p>
     </div>
-
     <div class="setting-group">
       <label for="proxy-url-input">Cloudflare Worker URL</label>
-      <input
-        type="url"
-        id="proxy-url-input"
-        placeholder="https://shayari-proxy.yourname.workers.dev"
-        dir="ltr"
-        autocomplete="off"
-        spellcheck="false"
-      />
+      <input type="url" id="proxy-url-input" placeholder="https://shayari-proxy.yourname.workers.dev" dir="ltr" autocomplete="off" spellcheck="false" />
       <p class="setting-hint">See README for one-time setup instructions</p>
     </div>
-
     <div class="settings-actions">
       <button id="save-settings" type="button">Save Settings</button>
       <button id="clear-history" type="button" class="btn-secondary">Clear History</button>
     </div>
-
     <details class="about">
       <summary>About the Behr Engine</summary>
       <ul>
         <li>Words are looked up in a local dictionary (IndexedDB)</li>
         <li>Unknown words are transcribed by Claude once, then cached forever</li>
         <li>Weight counting and behr matching are pure local algorithms</li>
-        <li>Over-long syllables (ساتھ، درد) contribute L then S (2+1 morae)</li>
+        <li>Over-long syllables (ساتھ، درد) show as one L tile in Simple view</li>
         <li>Confirm/edit words to lock their weight permanently</li>
-        <li>Same line always gives identical output after all words are confirmed</li>
+        <li>Same line always gives identical output after words are confirmed</li>
       </ul>
     </details>
   </div>
 
   <!-- ── Edit popover ── -->
   <div id="edit-popover" class="edit-popover" hidden role="dialog" aria-label="Edit word"></div>
+
+  <!-- ── Dictionary overlay (full-screen, opened from menu) ── -->
+  <div id="panel-dict" class="panel-overlay" hidden role="dialog" aria-label="Dictionary">
+    <div class="panel-overlay-header">
+      <span class="panel-overlay-title">Dictionary · فرہنگ</span>
+      <button class="panel-overlay-close" id="dict-close" type="button" aria-label="Close dictionary">✕</button>
+    </div>
+    <div class="panel-overlay-content">
+      <div class="dict-controls">
+        <input type="text" id="dict-search" class="dict-search" placeholder="Search…" autocomplete="off" />
+        <div class="dict-filter-row">
+          <button id="dict-filter-all"    class="dict-filter-btn active">All</button>
+          <button id="dict-filter-unconf" class="dict-filter-btn">Unconfirmed</button>
+          <button id="dict-export-btn"    class="btn-secondary dict-action-btn">Export</button>
+          <button id="dict-import-btn"    class="btn-secondary dict-action-btn">Import</button>
+          <input type="file" id="dict-import-file" accept=".json" hidden />
+        </div>
+      </div>
+      <div id="dict-list" class="dict-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Help / Manual overlay (full-screen, opened from menu) ── -->
+  <div id="panel-help" class="panel-overlay" hidden role="dialog" aria-label="Help and Manual">
+    <div class="panel-overlay-header">
+      <span class="panel-overlay-title">Help &amp; Manual</span>
+      <button class="panel-overlay-close" id="help-close" type="button" aria-label="Close help">✕</button>
+    </div>
+    <div class="panel-overlay-content help-content">
+
+      <p class="help-intro">A guide to checking the behr of Urdu shayari — and just enough ʿarūz to understand what the app tells you.</p>
+
+      <details open>
+        <summary>Part 1 — The one idea behind the whole tool</summary>
+        <p>Scanning a line of shayari has two completely different kinds of difficulty, and the app keeps them strictly apart.</p>
+        <p><strong>The easy-but-tedious part: counting.</strong> Once you know how a line is <em>pronounced</em>, working out the weight of each syllable and matching it to a behr is pure arithmetic. There is exactly one right answer. The app does this with a fixed algorithm — the same answer every single time.</p>
+        <p><strong>The genuinely hard part: pronunciation.</strong> Urdu script does not write short vowels. کل can be <em>kal</em>, <em>kil</em>, or <em>kul</em>; سہا can be <em>sahaa</em> or another reading entirely. <strong>You cannot tell the weight of a word from its spelling alone.</strong></p>
+        <p>The app's strategy: <strong>lock down the pronunciation once, then let the machine count forever.</strong> The first time it meets a word, it asks Claude for a pronunciation, shows it to you, and you confirm or fix it. After that the word lives in your <strong>dictionary</strong> — no guessing, no internet, identical results every time.</p>
+      </details>
+
+      <details>
+        <summary>Part 2 — Syllables and weight (the basics)</summary>
+        <p><strong>Short (S)</strong> — a consonant plus a short vowel, nothing closing it. One beat.</p>
+        <p><strong>Long (L)</strong> — a syllable is heavy if it contains a <em>long vowel</em> (کا، کی، کو) or <em>ends in a consonant</em> (دل، کر). Two beats.</p>
+        <p><strong>Over-long syllables.</strong> Some syllables have a long vowel and a closing consonant (روز، بات، ساتھ) or a short vowel with two closing consonants (درد، سبز). Heavier than a normal long.</p>
+        <ul>
+          <li><strong>Scanning by ear:</strong> feel one heavy beat — mark it <strong>L</strong>. روز is L.</li>
+          <li><strong>In the fine arithmetic:</strong> the exact value is L + a leftover short (L·S, numbers <code>2+1</code>). The app tracks this internally.</li>
+        </ul>
+        <p>In <strong>Simple</strong> view (default) روز shows as one <strong>L</strong> tile. Switch to <strong>Detailed</strong> to see the overflow mora — useful only when a line is one beat off.</p>
+        <p><strong>The end of the line is free (anceps).</strong> The very last syllable can be counted either way. The app applies this automatically.</p>
+      </details>
+
+      <details>
+        <summary>Part 3 — How the app decides weight</summary>
+        <p>The app looks at the pronunciation you've confirmed (ShayriRoman) and applies these rules:</p>
+        <table class="help-table">
+          <thead><tr><th>The syllable is…</th><th>Weight</th></tr></thead>
+          <tbody>
+            <tr><td>short vowel, open (no coda) — <em>ki, na</em></td><td><strong>S</strong></td></tr>
+            <tr><td>short vowel + one coda — <em>dil, kar</em></td><td><strong>L</strong></td></tr>
+            <tr><td>long vowel, open — <em>jo, ko, be</em></td><td><strong>L</strong></td></tr>
+            <tr><td>long vowel + coda — <em>roz, bāt, sāth</em></td><td><strong>L</strong> (extra-heavy)</td></tr>
+            <tr><td>short vowel + two codas — <em>dard, sabz</em></td><td><strong>L</strong> (extra-heavy)</td></tr>
+          </tbody>
+        </table>
+        <p>Get the pronunciation right and the weight is automatic and always the same.</p>
+      </details>
+
+      <details>
+        <summary>Part 4 — ShayriRoman: how pronunciations are written</summary>
+        <table class="help-table">
+          <thead><tr><th>Sound</th><th>Write</th></tr></thead>
+          <tbody>
+            <tr><td>short a / i / u</td><td><code>a</code> &nbsp;<code>i</code> &nbsp;<code>u</code></td></tr>
+            <tr><td>long ā</td><td><code>aa</code></td></tr>
+            <tr><td>long ī</td><td><code>ii</code></td></tr>
+            <tr><td>long ū</td><td><code>uu</code></td></tr>
+            <tr><td>e / o</td><td><code>e</code> &nbsp;<code>o</code></td></tr>
+            <tr><td>ai / au</td><td><code>ai</code> &nbsp;<code>au</code></td></tr>
+          </tbody>
+        </table>
+        <p><code>a</code> vs <code>aa</code> is the key distinction — short vs long. Most weight mistakes are a vowel length typed wrong.</p>
+        <p><strong>Aspirates are ONE consonant:</strong> تھ = <code>th</code>, کھ = <code>kh</code>, گھ = <code>gh</code>, بھ = <code>bh</code>, پھ = <code>ph</code>. So اٹھا = <code>uthaa</code>, not <code>uthhaa</code>. The app warns you when it sees a doubled-h.</p>
+        <p><strong>Nasalisation:</strong> <code>~</code> after the vowel — جاں = <code>jaa~</code>. Does not add weight.</p>
+        <p><strong>Tashdid:</strong> double the consonant — محبت = <code>muhabbat</code>.</p>
+        <table class="help-table">
+          <thead><tr><th>Urdu</th><th>ShayriRoman</th><th>Weight</th></tr></thead>
+          <tbody>
+            <tr><td dir="rtl" lang="ur">دل</td><td><code>dil</code></td><td>L</td></tr>
+            <tr><td dir="rtl" lang="ur">روز</td><td><code>roz</code></td><td>L (extra-heavy)</td></tr>
+            <tr><td dir="rtl" lang="ur">ساتھ</td><td><code>saath</code></td><td>L (extra-heavy)</td></tr>
+            <tr><td dir="rtl" lang="ur">اٹھانا</td><td><code>uthaana</code></td><td>S L S</td></tr>
+            <tr><td dir="rtl" lang="ur">محبت</td><td><code>muhabbat</code></td><td>S L L</td></tr>
+            <tr><td dir="rtl" lang="ur">جاں</td><td><code>jaa~</code></td><td>L</td></tr>
+          </tbody>
+        </table>
+      </details>
+
+      <details>
+        <summary>Part 5 — One spelling, several readings</summary>
+        <p>Because short vowels aren't written, one Urdu spelling can map to several words with different pronunciations, weights, and meanings. سہا can be <em>sahaa</em> ("endured") or another reading of the same skeleton.</p>
+        <p>The app handles this honestly: a spelling can hold <strong>several readings</strong> in your dictionary, each with its own pronunciation and a short <strong>meaning</strong> note. When a line uses such a word, the app does not guess — it shows you the candidates and you tap the intended one. Your choice is remembered for that line.</p>
+        <p>Add a meaning note whenever a word could be read more than one way.</p>
+      </details>
+
+      <details>
+        <summary>Part 6 — The two tabs and how you'll actually work</summary>
+        <p><strong>Behr Checker</strong> — type or paste a line, pick a target behr (optional), tap <strong>Check Behr</strong>. You get a syllable strip (rose = S, teal = L), Total Matras, Pattern, Closest Behr, and Feet Analysis (✓/✗ per foot). Tap ✎ on any word to edit it on the spot.</p>
+        <p>The <strong>Simple / Detailed</strong> toggle above the strip controls over-long display. Simple (default) shows روز as one <strong>L</strong>; Detailed reveals the overflow mora. Use Detailed only when hunting a missing beat.</p>
+        <p><strong>Word Lookup</strong> — look up a single word's pronunciation and meaning.</p>
+        <p><strong>Dictionary</strong> (⋮ menu) — your full word collection. Search, filter to Unconfirmed, Export/Import to back up your work, edit or delete any entry including confirmed ones.</p>
+      </details>
+
+      <details>
+        <summary>Part 7 — Confirming new words</summary>
+        <p>When a line contains new words, a <strong>"New words — please confirm"</strong> panel appears. Check the proposed pronunciation, fix any wrong vowel lengths, add an optional meaning note, then ✓.</p>
+        <ol>
+          <li><strong>Long vs short vowels:</strong> <code>kaa</code> vs <code>ka</code> is the difference between L and S. Read the word aloud.</li>
+          <li><strong>Aspirate doubled-h:</strong> اٹھا = <code>uthaa</code>, not <code>uthhaa</code>. The app warns you when it sees doubled-h in the translit.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Part 8 — Pronunciation vs. weight override</summary>
+        <p><strong>Pronunciation (normal):</strong> give the ShayriRoman and the app derives weight. Use this for almost every word.</p>
+        <p><strong>Override (rare):</strong> type the weight directly (e.g. <code>2</code> for L, <code>1 2</code> for S L). Reserve for small grammar words whose weight isn't predictable from sound: یہ، وہ، کہ، نہ، نے. A dictionary row shows <code>[1 2]</code> when an override is in force.</p>
+        <p>Only override when the pronunciation is already correct but the weight still comes out wrong. Otherwise, fix the pronunciation.</p>
+      </details>
+
+      <details>
+        <summary>Part 9 — Reading the result</summary>
+        <p><strong>Total Matras</strong> — beat count (S = 1, L = 2).</p>
+        <p><strong>Pattern</strong> — your line as S/L.</p>
+        <p><strong>"N moras off"</strong> — 0 means the line sits cleanly in that behr; a small number means one syllable to fix; a large number likely means a different meter.</p>
+        <p><strong>Feet Analysis</strong> — most useful for fixing. A ✗ foot shows expected-vs-actual. Fix the ✗ feet and re-check. The final syllable is always free.</p>
+      </details>
+
+      <details>
+        <summary>Part 10 — Behr names glossary</summary>
+        <table class="help-table">
+          <thead><tr><th>Rukn (foot)</th><th>Pattern</th></tr></thead>
+          <tbody>
+            <tr><td>faʿūlun</td><td>S L L</td></tr>
+            <tr><td>fāʿilun</td><td>L S L</td></tr>
+            <tr><td>mafāʿīlun</td><td>S L L L</td></tr>
+            <tr><td>fāʿilātun</td><td>L S L L</td></tr>
+            <tr><td>mustafʿilun</td><td>L L S L</td></tr>
+            <tr><td>mutafāʿilun</td><td>S S L S L</td></tr>
+          </tbody>
+        </table>
+        <p><em>murabbaʿ</em> = 4 feet · <em>musaddas</em> = 6 · <em>musamman</em> = 8.</p>
+        <p><em>maḥzūf</em> = final part of foot dropped · <em>makhbūn</em> = specific internal beat dropped.</p>
+        <p>Example: <strong>Ramal Musamman Maḥzūf</strong> = Ramal family, 8 feet, last foot shortened — one of the most common ghazal meters.</p>
+      </details>
+
+      <details>
+        <summary>Part 11 — Common questions &amp; fixes</summary>
+        <dl class="help-faq">
+          <dt>روز shows as L — is that right?</dt>
+          <dd>Yes. روز is one heavy long syllable. In Detailed view you'll see its overflow mora, but it counts as one L.</dd>
+          <dt>A line is one mora off and I can't see where</dt>
+          <dd>Switch to Detailed view to reveal overflow morae, then read Feet Analysis for the ✗ foot.</dd>
+          <dt>I confirmed a word wrong</dt>
+          <dd>Open Dictionary from the ⋮ menu, search the word, edit or delete it, and re-check the line. Confirmed entries are always editable.</dd>
+          <dt>Is the answer reliable run to run?</dt>
+          <dd>Yes — identical input gives identical output. The only thing that varies is a first-time proposal, which you lock down by confirming.</dd>
+        </dl>
+      </details>
+
+      <details>
+        <summary>Part 12 — Keeping your work safe</summary>
+        <p>Use <strong>Export</strong> in the Dictionary to save a backup file, and <strong>Import</strong> to restore it or move it to another device. The app and all confirmed vocabulary work offline — only the first sighting of a new word needs the internet.</p>
+        <p class="help-note"><em>This tool is meant to make you a better reader of meter, not to replace your ear. The more you teach it by confirming words thoughtfully, the more it confirms what you already hear.</em></p>
+      </details>
+
+    </div>
+  </div><!-- /panel-help -->
 
   <script src="mora-engine.js"></script>
   <script src="storage.js"></script>
