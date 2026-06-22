@@ -1395,6 +1395,9 @@ main {
   overflow: hidden;
 }
 
+/* Prevent display:flex from overriding the hidden attribute */
+.panel-overlay[hidden] { display: none; }
+
 .panel-overlay-header {
   display: flex;
   align-items: center;
