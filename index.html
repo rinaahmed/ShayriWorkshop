@@ -87,8 +87,17 @@
       <section class="card confirm-bar" id="confirm-bar" hidden>
       </section>
 
+      <!-- Reading chooser for ambiguous words (multiple pronunciations) -->
+      <section class="card chooser-section" id="reading-chooser" hidden>
+      </section>
+
       <section class="card results-section" id="results" hidden>
         <div class="syllable-strip-wrap">
+          <div class="strip-controls">
+            <button id="display-mode-toggle" class="display-mode-btn" type="button">
+              <span id="display-mode-label">Simple</span>
+            </button>
+          </div>
           <div class="syllable-strip" id="syllable-strip" dir="rtl" aria-label="Syllable breakdown"></div>
         </div>
 

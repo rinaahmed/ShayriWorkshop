@@ -804,17 +804,21 @@ main {
   flex-shrink: 0;
 }
 
-/* Over-long tile (saath, dard): single tile, split L/S marker */
+/* Over-long tile (saath, dard): ONE long tile labeled "L" (Simple mode) */
 .syllable-tile.overlong {
   border-color: var(--teal);
-  background: linear-gradient(180deg, rgba(26,82,118,0.07) 55%, rgba(192,57,43,0.07) 55%);
-  min-width: 54px;
+  background: rgba(26, 82, 118, 0.06);
+  min-width: 48px;
 }
 
-.syllable-tile.overlong .syl-marker {
-  display: flex;
-  gap: 3px;
-  align-items: center;
+/* Detailed mode: small ·S suffix on the same tile */
+.syl-s-detail {
+  color: var(--rose);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 700;
+  margin-left: 1px;
+  vertical-align: super;
 }
 
 .syl-l { color: var(--teal); font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; }
@@ -1181,4 +1185,151 @@ main {
   font-size: 0.82rem;
   color: var(--text-muted);
   padding: 2rem 0;
+}
+
+/* ── Strip controls: Simple/Detailed toggle (Revision A) ── */
+.syllable-strip-wrap {
+  position: relative;
+}
+
+.strip-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.display-mode-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  letter-spacing: 0.03em;
+}
+.display-mode-btn:hover {
+  background: var(--rust-light);
+  color: var(--rust);
+  border-color: var(--rust);
+}
+
+/* ── Reading chooser (Revision C) ── */
+.chooser-section {
+  padding: 1rem 1.25rem;
+}
+
+.chooser-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.chooser-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chooser-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chooser-word-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.chooser-surface {
+  font-family: var(--font-urdu);
+  font-size: 1rem;
+  color: var(--text);
+  min-width: 3rem;
+  flex-shrink: 0;
+}
+
+.chooser-options {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.chooser-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  text-align: left;
+}
+.chooser-option-btn:hover {
+  background: var(--gold-light);
+  border-color: var(--gold);
+}
+.chooser-option-btn.selected {
+  background: var(--gold-light);
+  border-color: var(--gold);
+}
+
+.chooser-translit {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chooser-meaning {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+/* ── Aspirate hint in edit popover (Revision B/C) ── */
+.aspirate-hint {
+  font-size: 0.72rem;
+  color: #8B6914;
+  background: rgba(200, 146, 42, 0.1);
+  border: 1px solid rgba(200, 146, 42, 0.3);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  margin: 0.25rem 0;
+  line-height: 1.4;
+}
+
+/* ── Meaning field in confirm bar (Revision C) ── */
+.confirm-meaning-input {
+  flex: 1;
+  min-width: 80px;
+  max-width: 130px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: var(--font-ui);
+  background: var(--card);
+  color: var(--text);
+}
+.confirm-meaning-input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+/* ── Meaning in dictionary list (Revision C) ── */
+.dict-meaning {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-right: 0.25rem;
 }

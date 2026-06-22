@@ -23,7 +23,7 @@ Output: {"results":[{"surface":"دل","translit":"dil"},{"surface":"ساتھ","t
 Return ONLY minified JSON, no prose, no code fences:
 {"results":[{"surface":"<urdu word>","translit":"<shayriroman>","alt":"<optional>"}]}`;
 
-// ── Word Lookup prompt (unchanged) ────────────────────────────────────────────
+// ── Word Lookup prompt ────────────────────────────────────────────────────────
 const LOOKUP_PROMPT = `You are an expert in Urdu language and classical shayari (poetry).
 
 When given a word or phrase, determine if it is Urdu (any script or Roman Urdu) or English, then provide comprehensive information.
@@ -50,7 +50,7 @@ Return this exact JSON structure:
   "poeticNote": "How this word is used in Urdu shayari, ghazals, or nazms — special poetic connotations, common imagery, or notable usage by famous poets"
 }`;
 
-// ── Behr chip patterns → kept for chip display (S/L string format) ────────────
+// ── Behr chip patterns ────────────────────────────────────────────────────────
 const BEHR_CHIP_PATTERNS = {
   'Hazaj Murabbe':     'S-L-L-L-S-L-L-L',
   'Hazaj Musaddas':    'S-L-L-L-S-L-L-L-S-L-L-L',
@@ -97,11 +97,13 @@ const editPopover   = $('edit-popover');
 const dictListEl    = $('dict-list');
 
 // ── App state ─────────────────────────────────────────────────────────────────
-let behrTable        = { behrs: [] };
-let lastScan         = null;     // last successful scan result, for re-render on confirm
-let lastRawLine      = '';       // raw input at last scan, for re-run on confirm
+let behrTable      = { behrs: [] };
+let lastScan       = null;
+let lastRawLine    = '';
+let displayMode    = localStorage.getItem('displayMode') || 'simple'; // Rev A
+let currentChoices = {};  // Rev C: {surface → id} for the current line
 
-// ── Storage ───────────────────────────────────────────────────────────────────
+// ── Storage helper ────────────────────────────────────────────────────────────
 const store = {
   get:     k => localStorage.getItem(k) || '',
   set:     (k, v) => localStorage.setItem(k, v),
@@ -221,8 +223,9 @@ async function transcribeViaWorker(surfaces) {
   return parsed ? (parsed.results || []) : [];
 }
 
-// ── Syllable strip renderer ───────────────────────────────────────────────────
-function renderStrip(scan) {
+// ── Syllable strip renderer (Revision A: Simple/Detailed) ────────────────────
+function renderStrip(scan, mode) {
+  mode = mode || displayMode;
   stripEl.innerHTML = '';
 
   scan.words.forEach(word => {
@@ -235,11 +238,17 @@ function renderStrip(scan) {
 
     word.syllables.forEach(syl => {
       if (syl.overlong) {
+        // Revision A: ONE tile labeled "L" (simple) or "L·S" (detailed)
         const tile = document.createElement('div');
-        tile.className = 'syllable-tile overlong';
+        tile.className = 'syllable-tile overlong long';
         tile.setAttribute('title', word.translit || word.surface);
-        tile.innerHTML = `<span class="syl-urdu" dir="rtl" lang="ur">${escapeHtml(word.surface)}</span>
-                          <span class="syl-marker"><span class="syl-l">L</span><span class="syl-s">S</span></span>`;
+        if (mode === 'detailed') {
+          tile.innerHTML = `<span class="syl-urdu" dir="rtl" lang="ur">${escapeHtml(word.surface)}</span>
+                            <span class="syl-marker">L<span class="syl-s-detail">·S</span></span>`;
+        } else {
+          tile.innerHTML = `<span class="syl-urdu" dir="rtl" lang="ur">${escapeHtml(word.surface)}</span>
+                            <span class="syl-marker">L</span>`;
+        }
         group.appendChild(tile);
       } else {
         syl.units.forEach(unit => {
@@ -276,6 +285,65 @@ function renderStrip(scan) {
   });
 }
 
+// ── Reading chooser (Revision C: disambiguation for 2+ readings) ─────────────
+function showChooser(ambiguous) {
+  const chooserEl = $('reading-chooser');
+  if (!chooserEl) return;
+
+  chooserEl.innerHTML = `
+    <div class="chooser-header">
+      <span class="chooser-title">Multiple readings — tap to choose</span>
+    </div>
+    <div class="chooser-list" id="chooser-list"></div>`;
+  chooserEl.hidden = false;
+
+  const listEl = $('chooser-list');
+
+  for (const [surface, entries] of Object.entries(ambiguous)) {
+    const row = document.createElement('div');
+    row.className = 'chooser-word-row';
+
+    const surfaceSpan = document.createElement('span');
+    surfaceSpan.className = 'chooser-surface';
+    surfaceSpan.dir  = 'rtl';
+    surfaceSpan.lang = 'ur';
+    surfaceSpan.textContent = surface;
+    row.appendChild(surfaceSpan);
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'chooser-options';
+
+    entries.forEach(entry => {
+      const btn = document.createElement('button');
+      btn.className = 'chooser-option-btn';
+      if (currentChoices[surface] === entry.id) btn.classList.add('selected');
+
+      const translit = document.createElement('span');
+      translit.className = 'chooser-translit';
+      translit.textContent = entry.translit || '—';
+      btn.appendChild(translit);
+
+      if (entry.meaning) {
+        const meaning = document.createElement('span');
+        meaning.className = 'chooser-meaning';
+        meaning.textContent = entry.meaning;
+        btn.appendChild(meaning);
+      }
+
+      btn.addEventListener('click', async () => {
+        currentChoices[surface] = entry.id;
+        chooserEl.hidden = true;
+        await checkBehr();
+      });
+
+      optionsDiv.appendChild(btn);
+    });
+
+    row.appendChild(optionsDiv);
+    listEl.appendChild(row);
+  }
+}
+
 // ── Feet analysis renderer ────────────────────────────────────────────────────
 function renderFeet(scan, topMatch) {
   feetEl.innerHTML = '<h3>Feet Analysis</h3>';
@@ -284,22 +352,20 @@ function renderFeet(scan, topMatch) {
     return;
   }
 
-  // Determine foot count from arkan string (e.g. "... x2", "... x3")
-  const arkan = topMatch.arkan || '';
-  const xMatch = /x(\d+)/i.exec(arkan);
-  const numFeet = xMatch ? parseInt(xMatch[1]) : Math.min(4, topMatch.behrPattern.length);
+  const arkan    = topMatch.arkan || '';
+  const xMatch   = /x(\d+)/i.exec(arkan);
+  const numFeet  = xMatch ? parseInt(xMatch[1]) : Math.min(4, topMatch.behrPattern.length);
   const footSize = Math.round(topMatch.behrPattern.length / numFeet);
 
-  const linePattern  = scan.pattern;
-  const behrPattern  = topMatch.behrPattern;
+  const linePattern = scan.pattern;
+  const behrPattern = topMatch.behrPattern;
 
   for (let f = 0; f < numFeet; f++) {
-    const start = f * footSize;
-    const end   = start + footSize;
+    const start    = f * footSize;
+    const end      = start + footSize;
     const lineFoot = linePattern.slice(start, end);
     const behrFoot = behrPattern.slice(start, end);
 
-    // match = every position agrees (or only last unit differs = anceps)
     let match = true;
     for (let i = 0; i < Math.max(lineFoot.length, behrFoot.length); i++) {
       const isLast = i === behrFoot.length - 1;
@@ -327,7 +393,6 @@ function renderBehrMatches(scan, matches, targetPatternArray) {
         : `${top.cost === 0 ? 'Near' : top.cost + ' mora' + (top.cost > 1 ? 's' : '')} off · ${top.arkan || ''}`)
     : '';
 
-  // Runner-up matches
   let matchHtml = '';
   for (let i = 1; i < matches.length; i++) {
     const m = matches[i];
@@ -338,7 +403,6 @@ function renderBehrMatches(scan, matches, targetPatternArray) {
     </div>`;
   }
 
-  // Target behr comparison (if a chip is selected)
   let targetHtml = '';
   if (targetPatternArray && targetPatternArray.length) {
     const cmp = MoraEngine.comparePatterns(scan.pattern, targetPatternArray);
@@ -360,14 +424,13 @@ function renderBehrMatches(scan, matches, targetPatternArray) {
 function displayResults(result) {
   const { scan, matches } = result;
 
-  renderStrip(scan);
+  renderStrip(scan, displayMode);
 
   totalMatEl.textContent = scan.matras ?? '—';
   patternEl.textContent  = scan.patternSL ?? '—';
 
   const top = matches[0];
 
-  // Target pattern array (from chip or custom input)
   let targetPatternArray = null;
   const targetStr = targetPat.value.trim();
   if (targetStr) {
@@ -383,7 +446,15 @@ function displayResults(result) {
 
 // ── Confirmation bar ──────────────────────────────────────────────────────────
 function renderConfirmationBar(pendingWords) {
-  if (!pendingWords.length) { confirmBarEl.hidden = true; return; }
+  // Dedupe by surface (one entry per unique word)
+  const seen    = new Set();
+  const deduped = pendingWords.filter(w => {
+    if (seen.has(w.surface)) return false;
+    seen.add(w.surface);
+    return true;
+  });
+
+  if (!deduped.length) { confirmBarEl.hidden = true; return; }
 
   confirmBarEl.innerHTML = `
     <div class="confirm-bar-header">
@@ -404,24 +475,29 @@ function renderConfirmationBar(pendingWords) {
       <span class="confirm-urdu" dir="rtl" lang="ur">${escapeHtml(w.surface)}</span>
       <input class="confirm-translit-input" type="text" value="${escapeHtml(w.translit || '')}"
              placeholder="translit" aria-label="translit for ${escapeHtml(w.surface)}" />
+      <input class="confirm-meaning-input" type="text" value="${escapeHtml(w.meaning || '')}"
+             placeholder="meaning (optional)" aria-label="meaning gloss" />
       <input class="confirm-morae-input" type="text" value=""
              placeholder="morae e.g. 2 1" aria-label="morae override" />
       <button class="confirm-btn">✓</button>
       <button class="skip-btn">✗</button>`;
 
     const translitInput = item.querySelector('.confirm-translit-input');
+    const meaningInput  = item.querySelector('.confirm-meaning-input');
     const moraeInput    = item.querySelector('.confirm-morae-input');
     const confirmBtn    = item.querySelector('.confirm-btn');
     const skipBtn       = item.querySelector('.skip-btn');
 
     confirmBtn.addEventListener('click', async () => {
       const translit = translitInput.value.trim();
+      const meaning  = meaningInput.value.trim();
       const moraeStr = moraeInput.value.trim();
       const morae    = moraeStr ? moraeStr.split(/\s+/).map(Number).filter(n => n > 0) : undefined;
 
       await Storage.dictPut({
         surface:   w.surface,
         translit:  translit || w.translit || '',
+        meaning:   meaning || undefined,
         morae,
         source:    'user',
         confirmed: true,
@@ -429,7 +505,6 @@ function renderConfirmationBar(pendingWords) {
       await Storage.cacheClear();
       item.remove();
       if (!listEl.children.length) confirmBarEl.hidden = true;
-      // Re-run on the same line so results reflect the confirmed word
       await checkBehr();
     });
 
@@ -441,21 +516,24 @@ function renderConfirmationBar(pendingWords) {
     listEl.appendChild(item);
   }
 
-  pendingWords.forEach(renderItem);
+  deduped.forEach(renderItem);
 
   $('confirm-all-btn').addEventListener('click', async () => {
     const items = [...listEl.querySelectorAll('.confirm-item')];
     for (const item of items) {
       const surface  = item.dataset.surface;
       const translit = item.querySelector('.confirm-translit-input').value.trim();
+      const meaning  = item.querySelector('.confirm-meaning-input').value.trim();
       const moraeStr = item.querySelector('.confirm-morae-input').value.trim();
       const morae    = moraeStr ? moraeStr.split(/\s+/).map(Number).filter(n => n > 0) : undefined;
-      const existing = await Storage.dictGet(surface);
+      const existing = await Storage.dictGetReadings(surface);
+      const base     = existing[0] || {};
       await Storage.dictPut({
         surface,
-        translit: translit || existing?.translit || '',
+        translit: translit || base.translit || '',
+        meaning:  meaning || base.meaning || undefined,
         morae,
-        source:    'user',
+        source:   'user',
         confirmed: true,
       });
     }
@@ -465,32 +543,60 @@ function renderConfirmationBar(pendingWords) {
   });
 }
 
-// ── Edit popover ──────────────────────────────────────────────────────────────
-function openEditPopover(word) {
+// ── Edit popover (Revision B: always editable; Revision C: meaning + aspirate hint) ──
+function openEditPopover(entry) {
+  const hasAspirate = /hh/.test(entry.translit || '');
+  const moraeDisplay = (entry.morae || []).join(' ');
+  const moraeNote = moraeDisplay
+    ? `<span class="dict-morae">[${moraeDisplay}]</span> `
+    : '';
+  const aspirateWarn = hasAspirate
+    ? `<p class="aspirate-hint">⚠ Possible doubled-h — aspirates (th/kh/gh/dh/bh/ph) are one sound, not two</p>`
+    : '';
+
   editPopover.innerHTML = `
     <div class="popover-inner">
-      <h3 class="popover-title" dir="rtl" lang="ur">${escapeHtml(word.surface)}</h3>
+      <h3 class="popover-title" dir="rtl" lang="ur">${escapeHtml(entry.surface)}</h3>
       <label class="popover-label">ShayriRoman translit</label>
-      <input id="ep-translit" class="popover-input" type="text" value="${escapeHtml(word.translit || '')}" />
-      <label class="popover-label">Explicit morae override <span class="optional">(e.g. 2 1 — leave blank for auto)</span></label>
-      <input id="ep-morae" class="popover-input" type="text" value="${escapeHtml((word.morae || []).join(' '))}" placeholder="e.g. 2 1" />
+      <input id="ep-translit" class="popover-input" type="text" value="${escapeHtml(entry.translit || '')}" />
+      ${aspirateWarn}
+      <label class="popover-label">Meaning <span class="optional">(short gloss, e.g. "endured (sehna)")</span></label>
+      <input id="ep-meaning" class="popover-input" type="text" value="${escapeHtml(entry.meaning || '')}" placeholder="optional gloss" />
+      <label class="popover-label">Explicit morae override ${moraeNote}<span class="optional">(e.g. 2 1 — blank for auto)</span></label>
+      <input id="ep-morae" class="popover-input" type="text" value="${escapeHtml(moraeDisplay)}" placeholder="e.g. 2 1" />
       <div class="popover-actions">
-        <button id="ep-save">Save & re-scan</button>
+        <button id="ep-save">Save &amp; re-scan</button>
         <button id="ep-cancel" class="btn-secondary">Cancel</button>
       </div>
     </div>`;
   editPopover.hidden = false;
 
+  // Live aspirate hint while typing
+  const translitEl = $('ep-translit');
+  translitEl.addEventListener('input', () => {
+    const existing = editPopover.querySelector('.aspirate-hint');
+    const has      = /hh/.test(translitEl.value);
+    if (has && !existing) {
+      translitEl.insertAdjacentHTML('afterend',
+        `<p class="aspirate-hint">⚠ Possible doubled-h — aspirates (th/kh/gh/dh/bh/ph) are one sound</p>`);
+    } else if (!has && existing) {
+      existing.remove();
+    }
+  });
+
   $('ep-cancel').addEventListener('click', () => { editPopover.hidden = true; });
 
   $('ep-save').addEventListener('click', async () => {
     const translit = $('ep-translit').value.trim();
+    const meaning  = $('ep-meaning').value.trim();
     const moraeStr = $('ep-morae').value.trim();
     const morae    = moraeStr ? moraeStr.split(/\s+/).map(Number).filter(n => n > 0) : undefined;
 
     await Storage.dictPut({
-      surface:   word.surface,
-      translit:  translit || word.translit || '',
+      ...(entry.id ? { id: entry.id } : {}),
+      surface:   entry.surface,
+      translit:  translit || entry.translit || '',
+      meaning:   meaning || undefined,
       morae,
       source:    'user',
       confirmed: true,
@@ -501,17 +607,20 @@ function openEditPopover(word) {
   });
 }
 
-// ── Dictionary panel ──────────────────────────────────────────────────────────
-let dictFilter = 'all'; // 'all' | 'unconfirmed'
+// ── Dictionary panel (Revision C: id-based operations + meaning display) ──────
+let dictFilter = 'all';
 let dictSearch = '';
 
 async function renderDictionary() {
   if (!dictListEl) return;
-  const all     = await Storage.dictAll();
-  const search  = dictSearch.toLowerCase();
+  const all    = await Storage.dictAll();
+  const search = dictSearch.toLowerCase();
   const entries = all.filter(e => {
     if (dictFilter === 'unconfirmed' && e.confirmed) return false;
-    if (search && !e.surface.includes(search) && !(e.translit || '').toLowerCase().includes(search)) return false;
+    if (search &&
+        !e.surface.includes(search) &&
+        !(e.translit || '').toLowerCase().includes(search) &&
+        !(e.meaning  || '').toLowerCase().includes(search)) return false;
     return true;
   });
 
@@ -521,28 +630,28 @@ async function renderDictionary() {
   }
 
   dictListEl.innerHTML = entries.map(e => {
-    const morae = e.morae ? `<span class="dict-morae">[${e.morae.join(',')}]</span>` : '';
-    const badge = e.confirmed
+    const morae   = e.morae ? `<span class="dict-morae">[${e.morae.join(',')}]</span>` : '';
+    const meaning = e.meaning ? `<span class="dict-meaning">${escapeHtml(e.meaning)}</span>` : '';
+    const badge   = e.confirmed
       ? '<span class="dict-badge dict-badge--confirmed">confirmed</span>'
       : `<span class="dict-badge dict-badge--${e.source || 'llm'}">${e.source || 'llm'}</span>`;
+    const eid = escapeHtml(e.id || '');
     return `
-      <div class="dict-entry" data-surface="${escapeHtml(e.surface)}">
+      <div class="dict-entry" data-id="${eid}">
         <span class="dict-surface" dir="rtl" lang="ur">${escapeHtml(e.surface)}</span>
         <span class="dict-translit">${escapeHtml(e.translit || '—')}</span>
-        ${morae}
-        ${badge}
+        ${meaning}${morae}${badge}
         <div class="dict-actions">
-          ${!e.confirmed ? `<button class="dict-confirm-btn" data-surface="${escapeHtml(e.surface)}">✓</button>` : ''}
-          <button class="dict-edit-btn" data-surface="${escapeHtml(e.surface)}">✎</button>
-          <button class="dict-delete-btn" data-surface="${escapeHtml(e.surface)}">✕</button>
+          ${!e.confirmed ? `<button class="dict-confirm-btn" data-id="${eid}">✓</button>` : ''}
+          <button class="dict-edit-btn"   data-id="${eid}">✎</button>
+          <button class="dict-delete-btn" data-id="${eid}" data-surface="${escapeHtml(e.surface)}">✕</button>
         </div>
       </div>`;
   }).join('');
 
   dictListEl.querySelectorAll('.dict-confirm-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const s = btn.dataset.surface;
-      const e = await Storage.dictGet(s);
+      const e = await Storage.dictGetById(btn.dataset.id);
       if (e) { await Storage.dictPut({ ...e, confirmed: true }); await Storage.cacheClear(); }
       renderDictionary();
     });
@@ -550,15 +659,16 @@ async function renderDictionary() {
 
   dictListEl.querySelectorAll('.dict-edit-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const e = await Storage.dictGet(btn.dataset.surface);
+      const e = await Storage.dictGetById(btn.dataset.id);
       if (e) openEditPopover(e);
     });
   });
 
   dictListEl.querySelectorAll('.dict-delete-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      if (!confirm(`Delete "${btn.dataset.surface}" from dictionary?`)) return;
-      await Storage.dictDelete(btn.dataset.surface);
+      const surface = btn.dataset.surface;
+      if (!confirm(`Delete "${surface}" from dictionary?`)) return;
+      await Storage.dictDelete(btn.dataset.id);
       await Storage.cacheClear();
       renderDictionary();
     });
@@ -609,12 +719,15 @@ function renderHistory() {
   });
 }
 
-// ── Main behr check flow ──────────────────────────────────────────────────────
+// ── Main behr check flow (Revision C: 0/1/2+ readings) ───────────────────────
 async function checkBehr() {
   const rawLine = urduInput.value.trim();
   if (!rawLine) { showMsg('Please enter a line of shayari'); return; }
 
   const line = normalizeLine(rawLine);
+
+  // Reset per-line choices when a new line is entered
+  if (line !== normalizeLine(lastRawLine)) currentChoices = {};
   lastRawLine = rawLine;
 
   hideMsg();
@@ -623,26 +736,55 @@ async function checkBehr() {
   resultsEl.hidden     = true;
   confirmBarEl.hidden  = true;
 
+  const chooserEl = $('reading-chooser');
+  if (chooserEl) chooserEl.hidden = true;
+
   try {
-    // Cache hit → identical output instantly
-    const cached = await Storage.cacheGet(line);
-    if (cached) {
-      displayResults(cached);
-      saveHistory(line, cached);
-      renderHistory();
-      return;
+    // Cache hit (only when no pending chooser decision)
+    if (!Object.keys(currentChoices).length) {
+      const cached = await Storage.cacheGet(line);
+      if (cached) {
+        // Restore any stored choices from cache
+        if (cached.choices) Object.assign(currentChoices, cached.choices);
+        displayResults(cached);
+        saveHistory(line, cached);
+        renderHistory();
+        return;
+      }
     }
 
-    const surfaces = tokenizeLineToWords(line);
-    if (!surfaces.length) { showMsg('Could not find any Urdu words in the input'); return; }
+    const rawSurfaces = tokenizeLineToWords(line);
+    if (!rawSurfaces.length) { showMsg('Could not find any Urdu words in the input'); return; }
+    const surfaces = [...new Set(rawSurfaces)]; // dedupe for lookup
 
-    const { hits, misses } = await Storage.dictGetMany(surfaces);
+    const { reads, misses } = await Storage.dictGetManyReadings(surfaces);
 
-    // Transcribe unknown words (one API call for all misses)
-    const pending = [];
-    if (misses.length) {
-      checkBtn.textContent = `Transcribing ${misses.length} new word${misses.length > 1 ? 's' : ''}…`;
-      const proposals = await transcribeViaWorker(misses);
+    const entryMap       = {}; // surface → entry to use
+    const ambiguousWords = {}; // surface → [entries] — user must choose
+    const pending        = []; // newly transcribed, unconfirmed
+
+    // Process known words
+    for (const [surface, entries] of Object.entries(reads)) {
+      if (entries.length === 1) {
+        entryMap[surface] = entries[0];
+      } else {
+        // 2+ readings: check if user has chosen one for this line
+        const chosenId = currentChoices[surface];
+        const chosen   = chosenId ? entries.find(e => e.id === chosenId) : null;
+        if (chosen) {
+          entryMap[surface] = chosen;
+        } else {
+          ambiguousWords[surface] = entries;
+          entryMap[surface] = entries[0]; // provisional default for scan
+        }
+      }
+    }
+
+    // Transcribe unknown words (one batched API call)
+    const toTranscribe = misses.filter(s => !entryMap[s]);
+    if (toTranscribe.length) {
+      checkBtn.textContent = `Transcribing ${toTranscribe.length} new word${toTranscribe.length > 1 ? 's' : ''}…`;
+      const proposals = await transcribeViaWorker(toTranscribe);
 
       for (const p of proposals) {
         if (!p.translit) continue;
@@ -654,32 +796,37 @@ async function checkBehr() {
           confirmed: false,
         };
         await Storage.dictPut(entry);
-        hits[p.surface] = entry;
+        entryMap[p.surface] = entry;
         pending.push(entry);
       }
 
-      // Words the LLM failed to transcribe — queue as empty
-      misses.forEach(s => {
-        if (!hits[s]) {
-          hits[s] = { surface: s, translit: s, source: 'llm', confirmed: false };
-          pending.push(hits[s]);
+      // Words LLM failed to transcribe
+      toTranscribe.forEach(s => {
+        if (!entryMap[s]) {
+          entryMap[s] = { surface: s, translit: s, source: 'llm', confirmed: false };
+          pending.push(entryMap[s]);
         }
       });
     }
 
-    // Scan with mora engine (pure, deterministic)
-    const entries = surfaces.map(s => hits[s] || { surface: s, translit: s });
+    // Scan uses the original order (with duplicates preserved)
+    const entries = rawSurfaces.map(s => entryMap[s] || { surface: s, translit: s });
     const scan    = MoraEngine.scanWords(entries);
     const matches = MoraEngine.matchBehr(scan.pattern, behrTable, 3);
 
-    const result = { line, scan, matches };
-    await Storage.cachePut(line, result);
+    const result = { line, scan, matches, choices: { ...currentChoices } };
+
+    // Only cache when there are no unresolved ambiguous words
+    if (!Object.keys(ambiguousWords).length) {
+      await Storage.cachePut(line, result);
+    }
 
     lastScan = result;
     displayResults(result);
     saveHistory(line, result);
     renderHistory();
 
+    if (Object.keys(ambiguousWords).length) showChooser(ambiguousWords);
     if (pending.length) renderConfirmationBar(pending);
 
   } catch (err) {
@@ -741,8 +888,8 @@ async function lookupWord() {
   if (!word) { showMsg('Please enter a word to look up'); return; }
 
   hideMsg();
-  lookupBtn.disabled    = true;
-  lookupBtn.textContent = 'Looking up…';
+  lookupBtn.disabled     = true;
+  lookupBtn.textContent  = 'Looking up…';
   lookupResultsEl.hidden = true;
 
   try {
@@ -788,7 +935,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 // Word input direction detection
 wordInput.addEventListener('input', () => {
   const hasUrdu = /[؀-ۿ]/.test(wordInput.value);
-  wordInput.dir = hasUrdu ? 'rtl' : 'ltr';
+  wordInput.dir  = hasUrdu ? 'rtl' : 'ltr';
   wordInput.lang = hasUrdu ? 'ur' : 'en';
   wordInput.classList.toggle('urdu-mode', hasUrdu);
 });
@@ -870,6 +1017,28 @@ historyToggle.addEventListener('click', () => {
   if (!historyList.hidden) renderHistory();
 });
 
+// Revision A: Simple / Detailed display mode toggle
+const displayModeToggle = $('display-mode-toggle');
+const displayModeLabel  = $('display-mode-label');
+
+function updateDisplayModeUI() {
+  if (!displayModeLabel) return;
+  displayModeLabel.textContent = displayMode === 'simple' ? 'Simple' : 'Detailed';
+  if (displayModeToggle) displayModeToggle.title = displayMode === 'simple'
+    ? 'Switch to Detailed (shows over-long morae split)'
+    : 'Switch to Simple (over-long shows as single L)';
+}
+
+if (displayModeToggle) {
+  updateDisplayModeUI();
+  displayModeToggle.addEventListener('click', () => {
+    displayMode = displayMode === 'simple' ? 'detailed' : 'simple';
+    localStorage.setItem('displayMode', displayMode);
+    updateDisplayModeUI();
+    if (lastScan) renderStrip(lastScan.scan, displayMode);
+  });
+}
+
 // Dictionary controls
 const dictSearchInput  = $('dict-search');
 const dictFilterAll    = $('dict-filter-all');
@@ -938,7 +1107,6 @@ if (window.location.hostname.includes('staging')) {
 loadSettings();
 renderHistory();
 
-// Load behr table + seed dictionary, then init storage
 async function init() {
   try {
     const [behrRes, seedRes] = await Promise.all([
