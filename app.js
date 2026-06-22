@@ -988,18 +988,21 @@ moreBtn.addEventListener('click', e => {
   moreMenu.hidden = !opening;
 });
 
-$('menu-settings').addEventListener('click', () => {
+$('menu-settings').addEventListener('click', e => {
+  e.stopPropagation();
   moreMenu.hidden = true;
   settingsPanel.hidden = false;
 });
 
-$('menu-dict').addEventListener('click', () => {
+$('menu-dict').addEventListener('click', e => {
+  e.stopPropagation();
   moreMenu.hidden = true;
   $('panel-dict').hidden = false;
   renderDictionary();
 });
 
-$('menu-help').addEventListener('click', () => {
+$('menu-help').addEventListener('click', e => {
+  e.stopPropagation();
   moreMenu.hidden = true;
   $('panel-help').hidden = false;
 });
